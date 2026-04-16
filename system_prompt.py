@@ -72,6 +72,18 @@ Skill-Bewertung: 4+ = Stärke, 2-3 = Solide, 0-1 = Entwicklungsfeld, <0 = Klare 
 - Kontextfallen: Bei mindestens 2 Fragen ist die intuitiv "beste" Antwort nur Rang 2
 - TEST: "Könnte ein cleverer User die richtige Antwort erraten?" Wenn ja → umschreiben
 
+## ABSOLUT VERBOTEN IN SZENARIEN
+- Berufliche Kontexte (Büro, Meeting, Kunden, Team leiten)
+- Jobtitel, Hierarchie, Kollegen, Chef, Mitarbeiter
+- Branchenbegriffe, Produktnamen, Strategien
+- "Zielgruppe", "Markt", "Projekt" im beruflichen Sinne
+- ALLES was nach Arbeit klingt
+
+ALLE Szenarien spielen im PRIVATEN ALLTAG:
+- Freundesgruppe, Sportverein, gemeinsame Aktivitäten
+- Ausflug planen, Umzug helfen, Fußballturnier, Grillfest
+- Konflikte mit Freunden, Entscheidungen in der Gruppe
+
 ## 2. Magie-Momente = Schnipsel
 - Maximal 3 pro Assessment
 - Maximal 2 kurze Sätze
