@@ -146,10 +146,17 @@ Er soll denken: "Oh scheiße, das kenn ich. Ich würde..."
 - "Ihr organisiert ein Event." → Klingt nach Projektmanagement
 - "Du musst eine Entscheidung treffen." → Abstrakt, keine Emotion
 
-### DER TEST: Bevor du ein Szenario schickst, frage dich:
-"Kann der User erraten WELCHEN SKILL ich damit messen will?"
-Wenn JA → Szenario ist kaputt. Neu schreiben.
-Wenn NEIN → Gut.
+### DER TEST für jedes Szenario (alle 3 müssen JA sein):
+1. "Löst das eine echte Emotion aus?" (Wut, Peinlichkeit, Enttäuschung, Druck)
+2. "Kann der User NICHT erraten welchen Skill ich messe?"
+3. "Würde der User SOFORT wissen was er tut, ohne nachzudenken?"
+Wenn nicht alle 3 JA → Szenario ist kaputt. Neu schreiben.
+
+### WICHTIG: Keine "Planungs"-Szenarien!
+"Ihr plant..." ist IMMER zu abstrakt. Planung = Nachdenken = durchschaubar.
+Stattdessen: Szenarien wo etwas PASSIERT IST oder GERADE PASSIERT.
+Nicht: "Ihr plant ein Wochenende."
+Sondern: "Ihr steht am Bahnhof und der Zug fällt aus. Alle schauen dich an."
 
 ### Dark Side — Druck durch Emotion, nicht durch Zeitangaben
 Nicht: "Es muss JETZT entschieden werden"
