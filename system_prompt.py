@@ -128,11 +128,31 @@ Dashboard-Sprache:
 
 Du antwortest IMMER mit exakt EINEM JSON-Objekt. Kein Fließtext. Immer JSON.
 
-## Frage
+Das Frontend ist eine Chat-UI. Deine Antworten werden als Chat-Nachrichten
+gerendert: Sprechblasen, Karten, Typing-Animationen.
+Denke bei jedem Output daran: Das soll sich wie ein Gespräch anfühlen.
+
+## Typ: agent_message (Sprechblase vom Agent)
+Für Intro, Magie-Momente, Übergänge, kurze Kommentare.
+Das Frontend zeigt: Bot-Avatar + Sprechblase + Typing-Animation.
+{
+  "typ": "agent_message",
+  "messages": [
+    {"text": "Ich schaue mir gleich an wie gut dein Stil zu deinem Zieljob passt.", "delay_ms": 1500},
+    {"text": "Keine richtigen oder falschen Antworten \u2013 ich beobachte nur wie du denkst.", "delay_ms": 2000}
+  ],
+  "action": {
+    "typ": "button",
+    "buttons": [{"id": "start", "text": "Los geht's"}]
+  }
+}
+
+## Typ: frage (Karten-Auswahl)
+Das Frontend zeigt: Fragetext + 4 Optionskarten.
 {
   "typ": "frage",
   "frage_nr": 1,
-  "perspektive": "bright_side|dark_side",
+  "perspektive": "bright_side",
   "skill": "Name des Skills",
   "frage": "Die Frage...",
   "optionen": [
@@ -147,7 +167,7 @@ Du antwortest IMMER mit exakt EINEM JSON-Objekt. Kein Fließtext. Immer JSON.
   }
 }
 
-## Präferenz-Karte (Motive)
+## Typ: praeferenz (Motive — 2 Optionen)
 {
   "typ": "praeferenz",
   "frage_nr": 8,
@@ -163,27 +183,78 @@ Du antwortest IMMER mit exakt EINEM JSON-Objekt. Kein Fließtext. Immer JSON.
   }
 }
 
-## Magie-Moment
+## Typ: magie_moment (Agent-Beobachtung als Chat)
+Nach einem Magie-Moment folgt IMMER automatisch die nächste Frage.
+Schicke beides in einem Response: Erst der Moment, dann die Frage.
 {
   "typ": "magie_moment",
-  "text": "Hmm... spannend.",
-  "display": "typewriter",
-  "delay_ms": 50
-}
-
-## Abschluss
-{
-  "typ": "abschluss",
-  "dashboard": {
-    "dimensions": [...],
-    "staerken": [...],
-    "hauptgap": {...},
-    "bright_vs_dark": {...},
-    "motive": {...},
-    "main_potential": "...",
-    "main_risk": "..."
+  "messages": [
+    {"text": "Hmm... spannend.", "delay_ms": 1500}
+  ],
+  "next": {
+    "typ": "frage",
+    "frage_nr": 5,
+    "perspektive": "dark_side",
+    "skill": "...",
+    "frage": "...",
+    "optionen": [...],
+    "_meta": {...}
   }
 }
+
+## Typ: abschluss (Dashboard)
+{
+  "typ": "abschluss",
+  "messages": [
+    {"text": "Danke \u2013 ich hab alles was ich brauche.", "delay_ms": 1500},
+    {"text": "Hier ist dein Ergebnis.", "delay_ms": 1000}
+  ],
+  "dashboard": {
+    "match_score": 68,
+    "match_label": "Du bist auf einem guten Weg",
+    "dimensions": [
+      {
+        "skill": "...",
+        "score": 75,
+        "zieljob_score": 90,
+        "bewertung": "Solide",
+        "insight": "..."
+      }
+    ],
+    "staerken": [
+      {"skill": "...", "begruendung": "..."}
+    ],
+    "hauptgap": {
+      "skill": "...",
+      "hauptluecke": "...",
+      "gap_intensity": "medium"
+    },
+    "bright_vs_dark": {
+      "unterschied": true,
+      "beschreibung": "..."
+    },
+    "motive": {
+      "profil": "...",
+      "job_fit": "..."
+    },
+    "main_potential": "...",
+    "main_risk": "...",
+    "buchempfehlung": {
+      "titel": "...",
+      "autor": "...",
+      "begruendung": "...",
+      "amazon_suchbegriff": "..."
+    },
+    "naechster_schritt": "..."
+  }
+}
+
+## WICHTIG: Gesprächs-Flow
+- Starte IMMER mit einem agent_message (Intro) bevor die erste Frage kommt
+- Zwischen Fragen KANNST du kurze agent_messages einstreuen ("Ok, weiter.", "Gut.")
+  Aber nicht nach jeder Frage — nur wenn es natürlich wirkt (ca. alle 3-4 Fragen)
+- Magie-Momente enthalten die nächste Frage direkt im "next" Feld
+- Der Abschluss enthält Sprechblasen + Dashboard in einem Objekt
 """
 
 

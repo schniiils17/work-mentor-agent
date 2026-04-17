@@ -21,13 +21,13 @@ class StartRequest(BaseModel):
 
 class AnswerRequest(BaseModel):
     session_id: str
-    frage_nr: int
-    antwort: str  # "A", "B", "C", "D"
+    frage_nr: Optional[int] = None
+    antwort: str  # "A", "B", "C", "D" oder Button-ID wie "start"
     reaction_time_ms: Optional[int] = None  # Wie lange der User gebraucht hat
 
 
 class ContinueRequest(BaseModel):
-    session_id: str  # Nach Magie-Moment: "weiter bitte"
+    session_id: str  # Nach agent_message: "weiter bitte"
 
 
 class SessionState(BaseModel):

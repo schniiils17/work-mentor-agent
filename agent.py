@@ -72,7 +72,7 @@ async def start_session(session_id: str, zieljob: str, aktueller_job: str,
     messages = [
         {
             "role": "user",
-            "content": "Starte das Assessment. Schicke die erste Frage."
+            "content": "Starte das Assessment. Schicke zuerst eine kurze Intro-Nachricht (agent_message) die den User begrüßt und erklärt was passiert. Danach die erste Frage."
         }
     ]
     
