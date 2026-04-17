@@ -203,7 +203,7 @@ async def continue_after_magic(session_id: str) -> dict:
 
 
 def _parse_agent_response(text: str) -> dict:
-    """Parst die JSON-Antwort des Agents."""
+    """Parst die JSON-Antwort des Agents. Handelt auch mehrere JSON-Objekte."""
     try:
         # Manchmal wrappen LLMs JSON in ```json ... ```
         cleaned = text.strip()
@@ -215,7 +215,15 @@ def _parse_agent_response(text: str) -> dict:
         
         return json.loads(cleaned)
     except json.JSONDecodeError:
-        # Fallback: Versuche JSON aus dem Text zu extrahieren
+        # Versuche mehrere JSON-Objekte zu finden (Agent schickt manchmal intro + frage)
+        objects = _extract_multiple_json(text)
+        if len(objects) == 1:
+            return objects[0]
+        elif len(objects) >= 2:
+            # Nimm das erste Objekt (intro), das zweite kommt beim nächsten Call
+            return objects[0]
+        
+        # Letzter Fallback
         try:
             start = text.index("{")
             end = text.rindex("}") + 1
@@ -227,3 +235,27 @@ def _parse_agent_response(text: str) -> dict:
                 "message": "Agent-Antwort konnte nicht geparst werden.",
                 "raw": text
             }
+
+
+def _extract_multiple_json(text: str) -> list[dict]:
+    """Extrahiert mehrere JSON-Objekte aus einem Text."""
+    objects = []
+    depth = 0
+    start = None
+    
+    for i, char in enumerate(text):
+        if char == '{':
+            if depth == 0:
+                start = i
+            depth += 1
+        elif char == '}':
+            depth -= 1
+            if depth == 0 and start is not None:
+                try:
+                    obj = json.loads(text[start:i+1])
+                    objects.append(obj)
+                except json.JSONDecodeError:
+                    pass
+                start = None
+    
+    return objects
