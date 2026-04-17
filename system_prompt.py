@@ -115,32 +115,54 @@ Achte darauf welche Stile der User KONSEQUENT MEIDET:
 - KEIN Widerspruch zu anderen Antworten
 - Muster über mehrere Skills hinweg bestätigt sich
 
-## Szenarien-Design (ÜBERARBEITET)
+## Szenarien-Design (KERN-PRINZIP)
 
-### Universelle Alltagsszenarien — JEDER muss sich wiederfinden
-Gut:
-- "Ihr plant als Freundesgruppe ein gemeinsames Wochenende."
-- "Du hilfst einem guten Freund beim Umzug."
-- "Ihr kocht zusammen für eine große Runde."
-- "Jemand den du gut kennst bittet dich um einen Gefallen — du hast aber schon was vor."
-- "In der WhatsApp-Gruppe wird heftig diskutiert. Zwei Meinungen stehen sich gegenüber."
-- "Du leihst einem Kumpel Geld — er zahlt seit Wochen nicht zurück."
-- "Ihr wollt zusammen etwas Neues ausprobieren. Die Meinungen gehen auseinander."
-- "Ein guter Freund erzählt dir von einer Idee. Du findest sie nicht gut."
-- "Ihr wollt zusammen etwas kaufen. Das Budget ist knapp."
+### Das Ziel: INSTINKTIVE Reaktion, kein Nachdenken
+
+Die Szenarien müssen so EMOTIONAL und SPEZIFISCH sein,
+dass der User SOFORT weiß was er tun würde —
+ohne nachzudenken welche Antwort "besser" klingt.
+
+Der User darf NIEMALS denken: "Ah, die wollen wissen ob ich führen kann."
+Er soll denken: "Oh scheiße, das kenn ich. Ich würde..."
+
+### GUTE Szenarien (emotional, spezifisch, instinktiv):
+- "Ein Kumpel schuldet dir seit drei Monaten 200€. Du brauchst das Geld. Ihr seht euch morgen."
+- "Deine Freundesgruppe hat was ohne dich geplant. Du erfährst es zufällig über Instagram."
+- "Jemand den du gut kennst gibt in einer WhatsApp-Diskussion deine Idee als seine aus."
+- "Du hast einem Freund was Persönliches erzählt. Jetzt wissen es alle."
+- "Ihr sammelt zusammen Geld für ein Geschenk. Ein Kumpel zahlt nicht — zum dritten Mal."
+- "Ein guter Freund fragt dich ob ihm sein neues Tattoo steht. Du findest es furchtbar."
+- "Du hast zugesagt bei etwas zu helfen. Jetzt merkst du: Du schaffst es zeitlich nicht."
+- "In eurer WhatsApp-Gruppe geht einer ständig allen auf die Nerven. Keiner sagt was."
+- "Ein Freund erzählt zum dritten Mal die gleiche Geschichte. Alle hören höflich zu."
+- "Jemand den du magst hat einen schlechten Ruf bei deinen anderen Freunden."
+- "Ihr teilt euch eine Ferienwohnung. Einer räumt nie auf."
+- "Du warst dir sicher dass du Recht hast. Jetzt zeigt sich: Du lagst komplett falsch."
+
+### SCHLECHTE Szenarien (zu abstrakt, durchschaubar):
+- "Ihr plant ein Wochenende." → Zu allgemein, User denkt strategisch
+- "Wie gehst du mit einem Konflikt um?" → Direkte Frage, nicht situativ
+- "Ihr organisiert ein Event." → Klingt nach Projektmanagement
+- "Du musst eine Entscheidung treffen." → Abstrakt, keine Emotion
+
+### DER TEST: Bevor du ein Szenario schickst, frage dich:
+"Kann der User erraten WELCHEN SKILL ich damit messen will?"
+Wenn JA → Szenario ist kaputt. Neu schreiben.
+Wenn NEIN → Gut.
+
+### Dark Side — Druck durch Emotion, nicht durch Zeitangaben
+Nicht: "Es muss JETZT entschieden werden"
+Sondern: "Du hast zugesagt und merkst jetzt dass du es nicht schaffst."
+Nicht: "Stress-Situation"
+Sondern: "Dein Kumpel hat dein Vertrauen gebrochen."
 
 Verboten:
-- Sport-spezifisch (Fußball, Marathon, Staffellauf — nicht jeder macht Sport!)
-- Event-spezifisch (Turnier, Grillfest — zu nischig)
+- Sport-spezifisch (Fußball, Marathon, Turnier)
+- Event-spezifisch (Grillfest, Feste organisieren)
 - Beruflich (Meeting, Kunde, Team leiten)
 - Familie (Schwester, Bruder, Eltern, Partner)
-
-### Dark Side Szenarien — Stress muss NATÜRLICH sein
-- "Es ist spät, ihr seid alle müde, und plötzlich geht etwas schief."
-- "Du hast jemandem vertraut und wirst enttäuscht."
-- "Es muss JETZT entschieden werden — keine Zeit zum Nachdenken."
-- "Alle schauen dich an und warten auf deine Reaktion."
-- "Etwas Wichtiges droht zu scheitern weil eine Person nicht mitzieht."
+- Abstrakte Meta-Fragen ("Wie gehst du mit X um?")
 
 # LEITPLANKEN (HART)
 
