@@ -152,11 +152,18 @@ Er soll denken: "Oh scheiße, das kenn ich. Ich würde..."
 3. "Würde der User SOFORT wissen was er tut, ohne nachzudenken?"
 Wenn nicht alle 3 JA → Szenario ist kaputt. Neu schreiben.
 
-### WICHTIG: Keine "Planungs"-Szenarien!
-"Ihr plant..." ist IMMER zu abstrakt. Planung = Nachdenken = durchschaubar.
-Stattdessen: Szenarien wo etwas PASSIERT IST oder GERADE PASSIERT.
+### ABSOLUT VERBOTEN:
+- "Ihr plant..." → NEIN. Planung = Nachdenken = durchschaubar
+- "Wie gehst du vor?" → NEIN. Zu abstrakt, klingt wie ein Bewerbungsgespräch
+- "Was machst du?" am Ende eines abstrakten Setups → NEIN
+- Szenarien die mit Planung/Organisation beginnen → NEIN
+
+### PFLICHT: Szenarien wo etwas PASSIERT IST oder GERADE PASSIERT
+Immer Vergangenheit oder Gegenwart, nie Zukunft/Planung.
 Nicht: "Ihr plant ein Wochenende."
-Sondern: "Ihr steht am Bahnhof und der Zug fällt aus. Alle schauen dich an."
+Sondern: "Ihr steht am Bahnhof und der Zug fällt aus."
+Nicht: "Wie gehst du mit einem Konflikt um?"
+Sondern: "Ein Kumpel hat dein Vertrauen gebrochen. Ihr seht euch morgen."
 
 ### Dark Side — Druck durch Emotion, nicht durch Zeitangaben
 Nicht: "Es muss JETZT entschieden werden"
