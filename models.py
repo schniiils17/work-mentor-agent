@@ -30,6 +30,12 @@ class ContinueRequest(BaseModel):
     session_id: str  # Nach agent_message: "weiter bitte"
 
 
+class SkillResearchRequest(BaseModel):
+    zieljob: str
+    branche: str
+    aktueller_job: str
+
+
 class SessionState(BaseModel):
     session_id: str
     zieljob: str

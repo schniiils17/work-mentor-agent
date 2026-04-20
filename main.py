@@ -8,8 +8,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from models import StartRequest, AnswerRequest, ContinueRequest
+from models import StartRequest, AnswerRequest, ContinueRequest, SkillResearchRequest
 from agent import start_session, process_answer, continue_after_magic, sessions
+from skill_research import research_skills
 
 # .env laden
 load_dotenv()
@@ -45,6 +46,25 @@ async def root():
 async def health():
     """Health Check für Monitoring"""
     return {"status": "healthy", "active_sessions": len(sessions)}
+
+
+@app.post("/api/skills/research")
+async def api_skill_research(req: SkillResearchRequest):
+    """
+    Recherchiert echte Skills aus Stellenanzeigen + Web-Quellen.
+    
+    Schickt: zieljob, branche, aktueller_job
+    Bekommt: Skills mit Gewichtung + Rückfragen
+    """
+    try:
+        result = await research_skills(
+            zieljob=req.zieljob,
+            branche=req.branche,
+            aktueller_job=req.aktueller_job
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/assessment/start")
