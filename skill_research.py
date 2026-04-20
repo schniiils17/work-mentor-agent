@@ -140,28 +140,41 @@ async def research_skills(zieljob: str, branche: str, aktueller_job: str) -> dic
     
     # SCHRITT 1: Parallele Suchen
     search_tasks = [
-        # Stellenanzeigen
-        search_web(f"{zieljob} {branche} Stellenanzeige Anforderungen Skills", 10),
+        # Stellenanzeigen von konkreten Jobportalen
+        search_web(f"site:stepstone.de {zieljob} {branche} Stellenangebot", 10),
+        search_web(f"site:indeed.com {zieljob} {branche} Anforderungen", 5),
         # Erfolgsfaktoren + Scheitergründe  
-        search_web(f"{zieljob} {branche} Erfolgsfaktoren Anforderungen Kompetenzen", 10),
+        search_web(f"{zieljob} {branche} Anforderungen Kompetenzen Skills Profil", 10),
         search_web(f"{zieljob} häufigste Fehler scheitern Gründe", 5),
     ]
     
     results = await asyncio.gather(*search_tasks)
-    search_stellenanzeigen = results[0]
-    search_erfolgsfaktoren = results[1]
-    search_scheitergruende = results[2]
+    search_stepstone = results[0]
+    search_indeed = results[1]
+    search_erfolgsfaktoren = results[2]
+    search_scheitergruende = results[3]
+    search_stellenanzeigen = search_stepstone + search_indeed
     
-    # SCHRITT 2: Die besten 5 Seiten im Detail fetchen
-    urls_to_fetch = []
+    # SCHRITT 2: Die besten Seiten im Detail fetchen
+    # Priorität: Einzelne Stellenanzeigen > Karriere-Ratgeber > Listen
+    urls_stellenanzeigen = []
+    urls_ratgeber = []
     for r in (search_stellenanzeigen + search_erfolgsfaktoren + search_scheitergruende):
         url = r.get("url", "")
-        # Nur relevante Seiten fetchen (keine Indeed/Stepstone Listenansichten)
-        if url and not any(skip in url for skip in [
+        if not url:
+            continue
+        # Einzelne Stepstone-Stellenanzeigen (enthalten "stellenangebote--")
+        if "stepstone.de/stellenangebote--" in url:
+            urls_stellenanzeigen.append(url)
+        # Karriere-Ratgeber Seiten (nicht Listenansichten)
+        elif not any(skip in url for skip in [
             "indeed.com/q-", "stepstone.de/jobs/", "google.com",
-            "linkedin.com/jobs", ".pdf"
+            "linkedin.com/jobs", ".pdf", "/q-"
         ]):
-            urls_to_fetch.append(url)
+            urls_ratgeber.append(url)
+    
+    # Maximal 3 Stellenanzeigen + 2 Ratgeber
+    urls_to_fetch = urls_stellenanzeigen[:3] + urls_ratgeber[:2]
     
     # Maximal 5 Seiten fetchen
     urls_to_fetch = urls_to_fetch[:5]
