@@ -7,7 +7,7 @@ import json
 import os
 from anthropic import Anthropic
 from system_prompt import build_system_prompt
-from models import SessionState, Skill
+from models import SessionState, Skill, ResearchedSkill, VarianzAntwort
 
 # Claude Client
 client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
@@ -53,20 +53,42 @@ async def generate_skills(zieljob: str, aktueller_job: str, branche: str) -> lis
 
 
 async def start_session(session_id: str, zieljob: str, aktueller_job: str, 
-                         branche: str, skills: list[Skill] | None = None) -> dict:
+                         branche: str, skills: list[Skill] | None = None,
+                         researched_skills: list[ResearchedSkill] | None = None,
+                         varianz_antworten: list[VarianzAntwort] | None = None) -> dict:
     """Startet eine neue Assessment-Session."""
     
-    # Skills generieren wenn nicht übergeben
-    if not skills:
-        skills = await generate_skills(zieljob, aktueller_job, branche)
-    
-    # System-Prompt bauen
-    system_prompt = build_system_prompt(
-        zieljob=zieljob,
-        aktueller_job=aktueller_job,
-        branche=branche,
-        skills=[s.model_dump() for s in skills]
-    )
+    # Skills aus Research übernehmen oder generieren
+    if researched_skills:
+        # Konvertiere ResearchedSkills zu einfachen Skills für SessionState
+        skills = [
+            Skill(
+                name=rs.name,
+                begruendung=f"{rs.varianz_erklaerung or rs.kategorie} (Gewichtung: {rs.gewichtung})",
+                kategorie=rs.kategorie,
+                gewichtung=rs.gewichtung,
+                varianz=rs.varianz
+            )
+            for rs in researched_skills
+        ]
+        # System-Prompt mit erweiterten Daten bauen
+        system_prompt = build_system_prompt(
+            zieljob=zieljob,
+            aktueller_job=aktueller_job,
+            branche=branche,
+            skills=[s.model_dump() for s in skills],
+            researched_skills=[rs.model_dump() for rs in researched_skills],
+            varianz_antworten=[va.model_dump() for va in varianz_antworten] if varianz_antworten else None
+        )
+    else:
+        if not skills:
+            skills = await generate_skills(zieljob, aktueller_job, branche)
+        system_prompt = build_system_prompt(
+            zieljob=zieljob,
+            aktueller_job=aktueller_job,
+            branche=branche,
+            skills=[s.model_dump() for s in skills]
+        )
     
     # Erste Nachricht an Claude: "Starte das Assessment"
     messages = [

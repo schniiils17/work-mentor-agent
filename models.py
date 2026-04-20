@@ -9,6 +9,26 @@ from typing import Optional
 class Skill(BaseModel):
     name: str
     begruendung: str
+    kategorie: Optional[str] = None  # hard_skill / soft_skill
+    gewichtung: Optional[float] = None  # 0.0 - 1.0
+    varianz: Optional[str] = None  # hoch / mittel / niedrig
+
+
+class ResearchedSkill(BaseModel):
+    """Skill aus der Skill-Research-Engine (reichere Daten)."""
+    name: str
+    kategorie: str  # hard_skill / soft_skill
+    gewichtung: float  # 0.0 - 1.0
+    belege: list[str] = []
+    varianz: str = "niedrig"  # hoch / mittel / niedrig
+    varianz_erklaerung: str = ""
+
+
+class VarianzAntwort(BaseModel):
+    """Antwort auf eine Varianz-Rückfrage."""
+    frage: str
+    antwort: str  # Die gewählte Option
+    skill_anpassung: str  # Wie sich die Skills ändern
 
 
 class StartRequest(BaseModel):
@@ -16,7 +36,9 @@ class StartRequest(BaseModel):
     zieljob: str
     aktueller_job: str
     branche: str
-    skills: Optional[list[Skill]] = None  # Wenn leer, generiert der Agent sie selbst
+    skills: Optional[list[Skill]] = None  # Legacy: einfache Skills
+    researched_skills: Optional[list[ResearchedSkill]] = None  # NEU: aus Skill-Research
+    varianz_antworten: Optional[list[VarianzAntwort]] = None  # NEU: Antworten auf Rückfragen
 
 
 class AnswerRequest(BaseModel):

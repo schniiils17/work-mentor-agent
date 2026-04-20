@@ -81,7 +81,9 @@ async def api_start(req: StartRequest):
             zieljob=req.zieljob,
             aktueller_job=req.aktueller_job,
             branche=req.branche,
-            skills=req.skills
+            skills=req.skills,
+            researched_skills=req.researched_skills,
+            varianz_antworten=req.varianz_antworten
         )
         return result
     except Exception as e:

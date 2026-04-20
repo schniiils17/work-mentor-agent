@@ -394,12 +394,20 @@ Schicke beides in einem Response: Erst der Moment, dann die Frage.
 """
 
 
-def build_system_prompt(zieljob: str, aktueller_job: str, branche: str, skills: list[dict]) -> str:
+def build_system_prompt(zieljob: str, aktueller_job: str, branche: str, skills: list[dict],
+                         researched_skills: list[dict] | None = None,
+                         varianz_antworten: list[dict] | None = None) -> str:
     """Baut den vollständigen System-Prompt mit Job-Kontext."""
     
-    skills_text = ""
-    for i, skill in enumerate(skills, 1):
-        skills_text += f"\n{i}. **{skill['name']}** — {skill['begruendung']}"
+    # Wenn Skill-Research-Daten vorhanden → reicheren Kontext bauen
+    if researched_skills:
+        skills_text = build_researched_skills_context(researched_skills)
+        varianz_text = build_varianz_context(varianz_antworten) if varianz_antworten else ""
+    else:
+        skills_text = ""
+        for i, skill in enumerate(skills, 1):
+            skills_text += f"\n{i}. **{skill['name']}** — {skill['begruendung']}"
+        varianz_text = ""
     
     context = f"""
 
@@ -409,8 +417,9 @@ def build_system_prompt(zieljob: str, aktueller_job: str, branche: str, skills: 
 - **Aktueller Job:** {aktueller_job}
 - **Branche:** {branche}
 
-## Die 5 relevanten Skills für {zieljob} ({branche})
+## Skills für {zieljob} ({branche})
 {skills_text}
+{varianz_text}
 
 Nutze diese Skills als Grundlage für das Assessment.
 Definiere intern für jeden Skill 4 Stil-Anker mit job_fit.
@@ -422,8 +431,55 @@ DEIN DIAGNOSTIK-ANSATZ FÜR DIESE SESSION:
 - Wenn der User ein Harmoniemuster zeigt → gezielt Konfrontations-Szenario stellen
 - Wenn Bright Side und Dark Side sich unterscheiden → das ist GOLD für die Analyse
 - estimated_total startet bei 12 und darf sich nach oben anpassen (max 15)
+- FOKUSSIERE auf die Top-5 Skills (höchste Gewichtung)
+- Skills mit hoher Varianz brauchen MEHR Fragen (die Position ist dort unklar)
 
 Beginne jetzt mit dem Intro (agent_message), dann die erste Frage.
 """
     
     return SYSTEM_PROMPT + context
+
+
+def build_researched_skills_context(researched_skills: list[dict]) -> str:
+    """Baut Skills-Kontext aus Skill-Research-Daten."""
+    text = "\n### Aus ECHTEN Stellenanzeigen recherchiert:\n"
+    
+    # Sortiere nach Gewichtung
+    sorted_skills = sorted(researched_skills, key=lambda s: s.get('gewichtung', 0), reverse=True)
+    
+    for i, skill in enumerate(sorted_skills, 1):
+        name = skill.get('name', '?')
+        kat = skill.get('kategorie', '?')
+        gew = skill.get('gewichtung', 0)
+        varianz = skill.get('varianz', 'niedrig')
+        belege = skill.get('belege', [])
+        varianz_erkl = skill.get('varianz_erklaerung', '')
+        
+        text += f"\n{i}. **{name}** ({kat})"
+        text += f"\n   Gewichtung: {gew:.1f} | Varianz: {varianz}"
+        if belege:
+            text += f"\n   Belege: {', '.join(belege[:3])}"
+        if varianz_erkl and varianz in ('hoch', 'mittel'):
+            text += f"\n   ⚠️ Varianz-Info: {varianz_erkl}"
+    
+    text += "\n\n→ FOKUS auf Top-5 Skills (höchste Gewichtung). Die restlichen fließen ins Dashboard ein."
+    return text
+
+
+def build_varianz_context(varianz_antworten: list[dict]) -> str:
+    """Baut Kontext aus den Varianz-Rückfragen."""
+    if not varianz_antworten:
+        return ""
+    
+    text = "\n### Was der User über seine Zielposition gesagt hat:\n"
+    for va in varianz_antworten:
+        frage = va.get('frage', '?')
+        antwort = va.get('antwort', '?')
+        anpassung = va.get('skill_anpassung', '')
+        text += f"\n- **Frage:** {frage}"
+        text += f"\n  **Antwort:** {antwort}"
+        if anpassung:
+            text += f"\n  **Effekt:** {anpassung}"
+    
+    text += "\n\n→ Berücksichtige diese Antworten bei der Skill-Gewichtung und Szenario-Wahl!"
+    return text
