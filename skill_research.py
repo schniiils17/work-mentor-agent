@@ -18,58 +18,111 @@ OXYLABS_PASS = os.getenv("OXYLABS_PASS", "")
 
 
 async def search_web(query: str, count: int = 10) -> list[dict]:
-    """Web-Suche über Oxylabs SERP API."""
-    async with httpx.AsyncClient(timeout=15.0) as http:
+    """Web-Suche über Oxylabs SERP API oder DuckDuckGo Fallback."""
+    
+    # Versuche Oxylabs wenn Credentials vorhanden
+    if OXYLABS_USER and OXYLABS_PASS:
+        async with httpx.AsyncClient(timeout=15.0) as http:
+            try:
+                resp = await http.post(
+                    "https://realtime.oxylabs.io/v1/queries",
+                    auth=(OXYLABS_USER, OXYLABS_PASS),
+                    json={
+                        "source": "google_search",
+                        "query": query,
+                        "geo_location": "Germany",
+                        "locale": "de",
+                        "pages": 1,
+                        "parse": True,
+                    },
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    results = []
+                    for r in data.get("results", [{}])[0].get("content", {}).get("results", {}).get("organic", [])[:count]:
+                        results.append({
+                            "title": r.get("title", ""),
+                            "url": r.get("url", ""),
+                            "description": r.get("desc", ""),
+                        })
+                    return results
+            except Exception:
+                pass
+    
+    # Fallback: DuckDuckGo HTML Suche (kein API Key nötig)
+    async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as http:
         try:
-            resp = await http.post(
-                "https://realtime.oxylabs.io/v1/queries",
-                auth=(OXYLABS_USER, OXYLABS_PASS),
-                json={
-                    "source": "google_search",
-                    "query": query,
-                    "geo_location": "Germany",
-                    "locale": "de",
-                    "pages": 1,
-                    "parse": True,
-                },
+            resp = await http.get(
+                "https://html.duckduckgo.com/html/",
+                params={"q": query, "kl": "de-de"},
+                headers={"User-Agent": "Mozilla/5.0 (compatible; WorkMentor/1.0)"}
             )
             if resp.status_code == 200:
-                data = resp.json()
+                # Einfaches HTML Parsing
+                text = resp.text
                 results = []
-                for r in data.get("results", [{}])[0].get("content", {}).get("results", {}).get("organic", [])[:count]:
+                # Extrahiere Ergebnisse aus DuckDuckGo HTML
+                import re
+                snippets = re.findall(r'class="result__snippet">(.*?)</a>', text, re.DOTALL)
+                titles = re.findall(r'class="result__a"[^>]*>(.*?)</a>', text, re.DOTALL)
+                urls = re.findall(r'class="result__url"[^>]*>(.*?)</a>', text, re.DOTALL)
+                
+                for i in range(min(count, len(titles))):
                     results.append({
-                        "title": r.get("title", ""),
-                        "url": r.get("url", ""),
-                        "description": r.get("desc", ""),
+                        "title": re.sub(r'<[^>]+>', '', titles[i]).strip() if i < len(titles) else "",
+                        "url": urls[i].strip() if i < len(urls) else "",
+                        "description": re.sub(r'<[^>]+>', '', snippets[i]).strip() if i < len(snippets) else "",
                     })
                 return results
         except Exception:
             pass
+    
     return []
 
 
 async def fetch_page(url: str) -> str:
     """Fetcht eine Webseite und extrahiert Text."""
-    async with httpx.AsyncClient(timeout=15.0) as http:
+    
+    # Versuche Oxylabs wenn Credentials vorhanden
+    if OXYLABS_USER and OXYLABS_PASS:
+        async with httpx.AsyncClient(timeout=15.0) as http:
+            try:
+                resp = await http.post(
+                    "https://realtime.oxylabs.io/v1/queries",
+                    auth=(OXYLABS_USER, OXYLABS_PASS),
+                    json={
+                        "source": "universal",
+                        "url": url,
+                        "parse": True,
+                    },
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    content = data.get("results", [{}])[0].get("content", "")
+                    if isinstance(content, str):
+                        return content[:5000]
+                    return str(content)[:5000]
+            except Exception:
+                pass
+    
+    # Fallback: Direkt fetchen
+    async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as http:
         try:
-            resp = await http.post(
-                "https://realtime.oxylabs.io/v1/queries",
-                auth=(OXYLABS_USER, OXYLABS_PASS),
-                json={
-                    "source": "universal",
-                    "url": url,
-                    "parse": True,
-                },
+            resp = await http.get(
+                url,
+                headers={"User-Agent": "Mozilla/5.0 (compatible; WorkMentor/1.0)"}
             )
             if resp.status_code == 200:
-                data = resp.json()
-                content = data.get("results", [{}])[0].get("content", "")
-                # Truncate to avoid token explosion
-                if isinstance(content, str):
-                    return content[:5000]
-                return str(content)[:5000]
+                import re
+                # HTML Tags entfernen, nur Text
+                text = re.sub(r'<script[^>]*>.*?</script>', '', resp.text, flags=re.DOTALL)
+                text = re.sub(r'<style[^>]*>.*?</style>', '', text, flags=re.DOTALL)
+                text = re.sub(r'<[^>]+>', ' ', text)
+                text = re.sub(r'\s+', ' ', text).strip()
+                return text[:5000]
         except Exception:
             pass
+    
     return ""
 
 
