@@ -98,8 +98,8 @@ async def api_answer(req: AnswerRequest):
     Schickt: session_id, frage_nr, antwort (A/B/C/D)
     Bekommt: Nächste Frage / Magie-Moment / Dashboard
     """
-    valid_answers = ["A", "B", "C", "D", "start", "ja", "nein", "weiter"]
-    if req.antwort.lower() not in [a.lower() for a in valid_answers]:
+    valid_answers = ["A", "B", "C", "D", "start", "ja", "nein", "weiter", "stimmt", "stimmt nicht"]
+    if req.antwort.upper() not in [a.upper() for a in valid_answers] and req.antwort.upper() not in ["A", "B", "C", "D"]:
         raise HTTPException(status_code=400, detail="Ungültige Antwort.")
     
     try:

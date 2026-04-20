@@ -176,7 +176,7 @@ async def process_answer(session_id: str, frage_nr: int, antwort: str,
     
     # Fragen-Counter updaten
     parsed = _parse_agent_response(assistant_text)
-    if parsed.get("typ") == "frage" or parsed.get("typ") == "praeferenz":
+    if parsed.get("typ") in ("frage", "praeferenz", "statement", "forced_choice"):
         session.fragen_gestellt += 1
     elif parsed.get("typ") == "abschluss":
         session.abgeschlossen = True
