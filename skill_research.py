@@ -160,7 +160,7 @@ Deine Kalibrierungs-Fragen müssen GENAU DIESE Unterschiede aufklären.
 Jede Frage muss die Skill-Gewichtung MESSBAR verändern.
 
 REGELN für Fragen:
-- Mindestens 3, maximal 5 Fragen
+- Mindestens 4, maximal 7 Fragen — lieber eine zu viel als den Job falsch zu verstehen!
 - Jede Frage hat 2-3 inhaltliche Optionen PLUS eine "Beides" oder "Gemischt" Option
 - Die letzte Option ist IMMER eine Ausweichoption ("Beides", "Gemischt", "Kommt drauf an")
 - Jede inhaltliche Option ändert welche Skills wie wichtig sind
