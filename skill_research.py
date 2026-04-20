@@ -138,53 +138,48 @@ async def research_skills(zieljob: str, branche: str, aktueller_job: str) -> dic
         }
     """
     
-    # SCHRITT 1: Parallele Suchen
+    # SCHRITT 1: Viele parallele Suchen für breite Datenbasis
+    # Die Snippets der Suchergebnisse sind unsere Hauptquelle!
     search_tasks = [
-        # Stellenanzeigen von konkreten Jobportalen
-        search_web(f"site:stepstone.de {zieljob} {branche} Stellenangebot", 10),
-        search_web(f"site:indeed.com {zieljob} {branche} Anforderungen", 5),
-        # Erfolgsfaktoren + Scheitergründe  
-        search_web(f"{zieljob} {branche} Anforderungen Kompetenzen Skills Profil", 10),
-        search_web(f"{zieljob} häufigste Fehler scheitern Gründe", 5),
+        # Stellenanzeigen (Snippets enthalten oft Anforderungen)
+        search_web(f"{zieljob} {branche} Stellenanzeige Anforderungen Qualifikation", 10),
+        search_web(f"{zieljob} {branche} Aufgaben Kompetenzen Profil", 10),
+        # Karriere-Ratgeber
+        search_web(f"{zieljob} werden Anforderungen Stärken Skills", 10),
+        search_web(f"{zieljob} Aufgaben Gehalt Karriere", 5),
+        # Scheitergründe + Erfolgsfaktoren
+        search_web(f"{zieljob} häufigste Fehler scheitern warum", 5),
+        search_web(f"{zieljob} Erfolgsfaktoren was macht einen guten", 5),
     ]
     
     results = await asyncio.gather(*search_tasks)
-    search_stepstone = results[0]
-    search_indeed = results[1]
-    search_erfolgsfaktoren = results[2]
-    search_scheitergruende = results[3]
-    search_stellenanzeigen = search_stepstone + search_indeed
+    all_search_results = []
+    for result_list in results:
+        all_search_results.extend(result_list)
     
-    # SCHRITT 2: Die besten Seiten im Detail fetchen
-    # Priorität: Einzelne Stellenanzeigen > Karriere-Ratgeber > Listen
-    urls_stellenanzeigen = []
-    urls_ratgeber = []
-    for r in (search_stellenanzeigen + search_erfolgsfaktoren + search_scheitergruende):
+    # SCHRITT 2: Nur 2-3 Karriere-Ratgeber Seiten im Detail fetchen
+    # (Die haben die besten, strukturierten Infos)
+    urls_to_fetch = []
+    for r in all_search_results:
         url = r.get("url", "")
         if not url:
             continue
-        # Einzelne Stepstone-Stellenanzeigen (enthalten "stellenangebote--")
-        if "stepstone.de/stellenangebote--" in url:
-            urls_stellenanzeigen.append(url)
-        # Karriere-Ratgeber Seiten (nicht Listenansichten)
-        elif not any(skip in url for skip in [
-            "indeed.com/q-", "stepstone.de/jobs/", "google.com",
-            "linkedin.com/jobs", ".pdf", "/q-"
+        # Nur Karriere-Ratgeber (nicht Jobbörsen-Listen)
+        if any(good in url for good in [
+            "karrierebibel.de", "karriereakademie.de", "karriere.at",
+            "mein-studium-karriere.de", "salesjob.de", "kursfinder.de",
+            "springerprofessional.de", "seismic.com"
         ]):
-            urls_ratgeber.append(url)
+            urls_to_fetch.append(url)
     
-    # Maximal 3 Stellenanzeigen + 2 Ratgeber
-    urls_to_fetch = urls_stellenanzeigen[:3] + urls_ratgeber[:2]
-    
-    # Maximal 5 Seiten fetchen
-    urls_to_fetch = urls_to_fetch[:5]
+    urls_to_fetch = urls_to_fetch[:3]
     
     page_texts = []
     if urls_to_fetch:
         fetch_tasks = [fetch_page(url) for url in urls_to_fetch]
         page_texts = await asyncio.gather(*fetch_tasks)
     
-    # SCHRITT 3: Stepstone Übersichtsseite fetchen (hat aggregierte Skill-Daten)
+    # SCHRITT 3: Stepstone Übersichtsseite (aggregierte Skill-Daten im Sidebar)
     stepstone_url = f"https://www.stepstone.de/jobs/{zieljob.lower().replace(' ', '-')}-in-{branche.lower().replace(' ', '-')}"
     stepstone_text = await fetch_page(stepstone_url)
     
@@ -202,14 +197,8 @@ Der User ist aktuell "{aktueller_job}".
 ### Stepstone Übersicht (aggregierte Skills)
 {stepstone_text[:3000]}
 
-### Suchergebnisse: Stellenanzeigen
-{json.dumps(search_stellenanzeigen, ensure_ascii=False, indent=1)[:2000]}
-
-### Suchergebnisse: Erfolgsfaktoren
-{json.dumps(search_erfolgsfaktoren, ensure_ascii=False, indent=1)[:2000]}
-
-### Suchergebnisse: Scheitergründe
-{json.dumps(search_scheitergruende, ensure_ascii=False, indent=1)[:1000]}
+### Alle Suchergebnisse (Stellenanzeigen + Ratgeber + Erfolgsfaktoren)
+{json.dumps(all_search_results, ensure_ascii=False, indent=1)[:6000]}
 
 ### Detail-Seiten
 {chr(10).join([f"--- Seite {i+1} ({urls_to_fetch[i] if i < len(urls_to_fetch) else 'N/A'}) ---{chr(10)}{t[:1500]}" for i, t in enumerate(page_texts)])}
