@@ -161,21 +161,23 @@ Jede Frage muss die Skill-Gewichtung MESSBAR verändern.
 
 REGELN für Fragen:
 - Mindestens 3, maximal 5 Fragen
-- Jede Frage hat 2-3 klare Optionen (nicht mehr)
-- Jede Option ändert welche Skills wie wichtig sind
+- Jede Frage hat 2-3 inhaltliche Optionen PLUS eine "Beides" oder "Gemischt" Option
+- Die letzte Option ist IMMER eine Ausweichoption ("Beides", "Gemischt", "Kommt drauf an")
+- Jede inhaltliche Option ändert welche Skills wie wichtig sind
 - Sprache: Du-Form, einfach, keine HR-Fachbegriffe
 - Die Fragen sind KEIN Quiz — sie helfen uns die Position zu verstehen
 
-GUTE Fragen:
-- "Wie groß wäre dein Team?" → 2-10 / 10-30 / 30+
-- "Liegt der Fokus eher auf Neukunden gewinnen oder Bestandskunden betreuen?"
-- "Wärst du viel unterwegs oder eher vom Büro aus?"
-- "Eher operative Führung (selbst mit verkaufen) oder strategisch (Team steuern)?"
+GUTE Fragen (mit Ausweichoption!):
+- "Wie groß wäre dein Team?" → 2-10 / 10-30 / 30+ / Weiß ich noch nicht
+- "Liegt der Fokus eher auf Neukunden oder Bestandskunden?" → Neukunden / Bestandskunden / Beides gleich wichtig
+- "Wärst du viel unterwegs oder eher vom Büro aus?" → Viel unterwegs / Büro / Mix aus beidem
+- "Eher operativ oder strategisch?" → Operativ / Strategisch / Beides
 
 SCHLECHTE Fragen:
 - "Welche Unternehmensgröße?" → zu generisch, ändert zu wenig
 - "Welche Branche?" → wissen wir schon
 - Alles was der User schon angegeben hat
+- Fragen OHNE Ausweichoption → User fühlt sich in eine Box gedrängt
 
 Antworte NUR mit JSON:
 {get_json_template()}
@@ -230,7 +232,8 @@ def get_json_template():
       "beeinflusst_skills": ["Skill 1", "Skill 2"],
       "optionen": [
         {"text": "Option A", "skill_anpassung": "Wie sich Skills ändern"},
-        {"text": "Option B", "skill_anpassung": "Wie sich Skills ändern"}
+        {"text": "Option B", "skill_anpassung": "Wie sich Skills ändern"},
+        {"text": "Beides / Gemischt", "skill_anpassung": "Beide Bereiche relevant, breites Profil"}
       ]
     }
   ],
