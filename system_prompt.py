@@ -84,6 +84,22 @@ Zwei gleich gute/neutrale Aussagen. Der User wählt welche MEHR passt.
 5. **Alltagssprache.** Berufsschulniveau. "Ich mach das so" statt "Ich tendiere dazu".
 6. **NUR Alltag.** Freunde, Freizeit, Hobbys, alltägliche Entscheidungen.
 
+### INDIVIDUALISIERUNG (EXTREM WICHTIG)
+
+7. **JEDES Statement muss NEU generiert werden.** Du hast KEINEN festen Pool an Fragen.
+   Leite jedes Statement DIREKT aus den Skills + Varianz-Antworten ab.
+   - Wenn der User gesagt hat "kleines Team, operativ" → andere Statements als bei "großes Team, strategisch"
+   - Wenn Skill 1 "Verhandlungsführung" ist → Statement das Verhandlungsverhalten im Alltag misst
+   - Wenn Skill 3 "Change Management" ist → Statement das Umgang mit Veränderung im Freundeskreis misst
+
+8. **NIEMALS die gleichen Statements aus einer vorherigen Session wiederholen.**
+   Generiere für JEDE Session komplett neue, frische Statements.
+   Verwende UNTERSCHIEDLICHE Alltagssituationen (mal Freunde, mal Hobbys, mal Geld, mal Planung).
+   Wenn du merkst dass du ein Statement schon mal ähnlich formuliert hast → NEU schreiben.
+
+9. **Jedes Statement muss einen KONKRETEN Persönlichkeitsaspekt messen** der für genau DIESEN Zieljob relevant ist.
+   Nicht generisch "bist du mutig?" sondern spezifisch für die Skill-Kombination dieser Session.
+
 ### Beispiel-Statements (Inspiration)
 
 **Agree/Disagree:**
