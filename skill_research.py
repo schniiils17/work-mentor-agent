@@ -19,7 +19,7 @@ async def fetch_jooble_jobs(zieljob: str, branche: str, count: int = 50) -> list
     if not JOOBLE_API_KEY:
         return []
     
-    url = f"https://jooble.org/api/{JOOBLE_API_KEY}"
+    url = f"https://de.jooble.org/api/{JOOBLE_API_KEY}"
     
     # Mehrere Suchanfragen für bessere Abdeckung
     queries = [
