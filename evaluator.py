@@ -85,9 +85,17 @@ async def evaluate_assessment(
     prompt = f"""Du bist ein erfahrener Eignungsdiagnostiker.
 Ein User hat ein Persönlichkeits-Assessment absolviert.
 
-## Zieljob
+## Zieljob (DAS bewerten wir!)
 **{zieljob}** in **{branche}**
-Aktuell: {aktueller_job}{job_text}
+
+## Aktueller Job (nur als Hintergrund-Info, NICHT im Dashboard erwähnen!)
+{aktueller_job}
+{job_text}
+
+WICHTIG: Das Dashboard bewertet AUSSCHLIESSLICH die Eignung für den ZIELJOB "{zieljob}".
+Der aktuelle Job "{aktueller_job}" ist NUR Kontext — erwähne ihn NICHT in den Insights.
+Schreibe NICHT "Deine Trainer-Erfahrung" oder "Als {aktueller_job} bringst du...".
+Der User will wissen ob er für den NEUEN Job passt, nicht was er jetzt schon kann.
 
 ## Kalibrierung
 {varianz_text if varianz_text else "Keine Kalibrierungsdaten"}
