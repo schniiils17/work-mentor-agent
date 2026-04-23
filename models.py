@@ -82,3 +82,20 @@ class SessionState(BaseModel):
     messages: list[dict]  # Claude conversation history
     fragen_gestellt: int = 0
     abgeschlossen: bool = False
+
+
+class ItemsRequest(BaseModel):
+    session_id: str
+
+
+class EvaluateRequest(BaseModel):
+    session_id: str
+    zieljob: str
+    aktueller_job: str
+    branche: str
+    job_beschreibung: str = ""
+    researched_skills: Optional[list[ResearchedSkill]] = None
+    varianz_antworten: Optional[list[VarianzAntwort]] = None
+    diagnostik_strategy: Optional[dict] = None
+    dimension_scores: dict  # {"durchsetzung": 0.7, "empathie": 0.4, ...}
+    answers: list[dict]  # [{"item_id": "D1", "antwort": "A"}, ...]

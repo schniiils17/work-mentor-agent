@@ -8,9 +8,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from models import StartRequest, AnswerRequest, ContinueRequest, SkillResearchRequest, JobClarifyRequest, DiagnostikStrategyRequest
+from models import StartRequest, AnswerRequest, ContinueRequest, SkillResearchRequest, JobClarifyRequest, DiagnostikStrategyRequest, ItemsRequest, EvaluateRequest
 from agent import start_session, process_answer, continue_after_magic, sessions
 from skill_research import research_skills, clarify_job, research_diagnostik_strategy
+from statement_pool import select_items_for_session, score_answers
+from evaluator import evaluate_assessment
 
 # .env laden
 load_dotenv()
@@ -103,6 +105,89 @@ async def api_skill_research(req: SkillResearchRequest):
             job_beschreibung=req.job_beschreibung
         )
         return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/assessment/items")
+async def api_items(req: ItemsRequest):
+    """
+    Gibt die Statement-Items für diese Session zurück.
+    Frontend rendert sie — keine KI-Generierung nötig.
+    
+    Schickt: session_id
+    Bekommt: Liste von 16 Items (12 Statements + 4 Forced Choice)
+    """
+    items = select_items_for_session(n_statements=12, n_forced=4)
+    
+    # In Frontend-Format umwandeln
+    formatted = []
+    for i, item in enumerate(items, 1):
+        total = len(items)
+        
+        if item["typ"] == "statement":
+            formatted.append({
+                "typ": "statement",
+                "item_id": item["id"],
+                "statement_nr": i,
+                "text": item["text"],
+                "optionen": [
+                    {"id": "A", "text": "\u2713 Stimmt"},
+                    {"id": "B", "text": "\u2717 Stimmt nicht"}
+                ],
+                "progress": {"current": i, "estimated_total": total, "phase": "statements"}
+            })
+        elif item["typ"] == "forced_choice":
+            formatted.append({
+                "typ": "forced_choice",
+                "item_id": item["id"],
+                "statement_nr": i,
+                "frage": item["frage"],
+                "optionen": [
+                    {"id": "A", "text": item["option_a"]},
+                    {"id": "B", "text": item["option_b"]}
+                ],
+                "progress": {"current": i, "estimated_total": total, "phase": "statements"}
+            })
+    
+    return {"items": formatted, "total": len(formatted)}
+
+
+@app.post("/api/assessment/evaluate")
+async def api_evaluate(req: EvaluateRequest):
+    """
+    Wertet das Assessment aus.
+    Frontend schickt alle Antworten + Scores.
+    Claude interpretiert im Job-Kontext → Dashboard.
+    
+    Schickt: dimension_scores, answers, job-kontext
+    Bekommt: Dashboard
+    """
+    try:
+        # Scores nochmal berechnen (Server-seitig verifizieren)
+        verified_scores = score_answers(req.answers)
+        
+        dashboard = await evaluate_assessment(
+            zieljob=req.zieljob,
+            aktueller_job=req.aktueller_job,
+            branche=req.branche,
+            job_beschreibung=req.job_beschreibung,
+            researched_skills=[s.model_dump() for s in req.researched_skills] if req.researched_skills else [],
+            varianz_antworten=[va.model_dump() for va in req.varianz_antworten] if req.varianz_antworten else [],
+            diagnostik_strategy=req.diagnostik_strategy,
+            dimension_scores=verified_scores,
+            answers=req.answers,
+        )
+        
+        return {
+            "typ": "abschluss",
+            "messages": [
+                {"text": "Danke — ich hab alles was ich brauche.", "delay_ms": 1500},
+                {"text": "Hier ist dein Ergebnis.", "delay_ms": 1000}
+            ],
+            "dashboard": dashboard,
+            "dimension_scores": verified_scores
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
