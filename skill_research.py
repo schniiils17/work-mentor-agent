@@ -15,7 +15,7 @@ JOOBLE_API_KEY = os.getenv("JOOBLE_API_KEY", "")
 
 
 async def clarify_job(zieljob: str, branche: str = "", aktueller_job: str = "") -> dict:
-    """Prüft ob der Zieljob eindeutig ist und bietet Interpretationen an."""
+    """Runde 1: Zeigt die wahrscheinlichste Interpretation und fragt 'Passt das?'"""
     
     branche_text = f" in der Branche '{branche}'" if branche else ""
     aktueller_text = f" (aktuell: {aktueller_job})" if aktueller_job else ""
@@ -25,42 +25,36 @@ async def clarify_job(zieljob: str, branche: str = "", aktueller_job: str = "") 
         max_tokens=1500,
         messages=[{"role": "user", "content": f"""Ein User hat als Zieljob eingegeben: "{zieljob}"{branche_text}{aktueller_text}
 
-Analysiere diesen Jobtitel:
+Deine Aufgabe:
+1. Was ist die WAHRSCHEINLICHSTE Interpretation dieses Jobtitels?
+2. Erstelle eine klare, kurze Beschreibung (2-3 Sätze, Du-Form, einfache Sprache)
+3. Generiere 2-3 alternative Interpretationen für den Fall dass Runde 1 nicht passt
 
-1. Ist der Jobtitel EINDEUTIG oder kann er VERSCHIEDENE Dinge bedeuten?
-2. Wenn mehrdeutig: Welche 2-4 verschiedenen Interpretationen gibt es?
-
-Beispiele für Mehrdeutigkeit:
-- "Leiter digitaler Vertrieb" könnte sein:
-  a) Führungskraft die ein Vertriebsteam leitet, das über digitale Kanäle verkauft
-  b) E-Commerce/Online-Marketing Manager der den digitalen Kanal verantwortet
-  c) Head of Digital Sales der die Digitalstrategie im Vertrieb entwickelt
-
-- "Vertriebsleiter" ist relativ eindeutig: Führungskraft die ein Vertriebsteam leitet
-
-- "Projektmanager" könnte sein:
-  a) IT-Projektmanager (Software-Projekte)
-  b) Bau-Projektleiter (Bauprojekte)
-  c) Marketing-Projektmanager
+WICHTIG bei der Interpretation:
+- Denke vom KERN des Jobs: Was macht man den ganzen Tag?
+- "Leiter digitaler Vertrieb" = Führungskraft die Verkäufer führt (die digital verkaufen), NICHT jemand der Marketing macht
+- "Vertriebsleiter" = Führt und coached ein Verkaufsteam
+- "Projektmanager" = Kann IT, Bau, Marketing etc. sein
+- Unterscheide IMMER: Führt Menschen vs. Macht selbst vs. Managed Prozesse
 
 Antworte NUR mit JSON:
 {{
-  "eindeutig": true/false,
-  "erkannt_als": "Kurze Beschreibung was du glaubst was gemeint ist (1 Satz)",
-  "interpretationen": [
+  "hauptinterpretation": {{
+    "titel": "Kurzer Titel (3-5 Wörter)",
+    "beschreibung": "2-3 Sätze was dieser Job bedeutet. Du-Form. Einfache Sprache. Fokus auf: Was machst du den ganzen Tag? Wen führst du? Was ist dein Ziel?",
+    "suchbegriffe": ["Suchbegriff für Jobbörse 1", "Suchbegriff 2"]
+  }},
+  "alternativen": [
     {{
-      "titel": "Kurzer prägnanter Titel",
-      "beschreibung": "Was genau diese Interpretation bedeutet (1-2 Sätze, Du-Form)",
-      "suchbegriffe": ["Suchbegriff 1", "Suchbegriff 2"],
-      "kernaufgaben": ["Aufgabe 1", "Aufgabe 2", "Aufgabe 3"]
+      "titel": "Alternativer Titel",
+      "beschreibung": "Was diese Alternative anders macht (1-2 Sätze, Du-Form)",
+      "suchbegriffe": ["Suchbegriff 1", "Suchbegriff 2"]
     }}
   ]
 }}
 
-Wenn eindeutig=true: Gib trotzdem 1 Interpretation (die offensichtliche).
-Wenn eindeutig=false: Gib 2-4 Interpretationen, die sich WIRKLICH unterscheiden.
-
-Wichtig: Die Interpretationen müssen sich in den KERN-AUFGABEN unterscheiden, nicht nur im Titel."""}]
+Gib IMMER 2-3 Alternativen — auch wenn der Job ziemlich eindeutig scheint.
+Die Alternativen müssen sich im KERN unterscheiden (andere Aufgaben, andere Rolle)."""}]
     )
     
     return parse_json_response(response.content[0].text.strip())
