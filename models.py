@@ -39,6 +39,7 @@ class StartRequest(BaseModel):
     skills: Optional[list[Skill]] = None  # Legacy: einfache Skills
     researched_skills: Optional[list[ResearchedSkill]] = None  # NEU: aus Skill-Research
     varianz_antworten: Optional[list[VarianzAntwort]] = None  # NEU: Antworten auf Rückfragen
+    diagnostik_strategy: Optional[dict] = None  # NEU: Diagnostik-Strategie aus Forschung
 
 
 class AnswerRequest(BaseModel):
@@ -56,6 +57,13 @@ class JobClarifyRequest(BaseModel):
     zieljob: str
     branche: str = ""
     aktueller_job: str = ""
+
+
+class DiagnostikStrategyRequest(BaseModel):
+    zieljob: str
+    branche: str = ""
+    skills: list[dict]
+    job_beschreibung: str = ""
 
 
 class SkillResearchRequest(BaseModel):

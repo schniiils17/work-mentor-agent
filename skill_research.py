@@ -343,6 +343,98 @@ Antworte NUR mit JSON:
 """
 
 
+async def research_diagnostik_strategy(zieljob: str, branche: str, skills: list[dict], job_beschreibung: str = "") -> dict:
+    """Recherchiert die beste diagnostische Strategie pro Skill.
+    
+    Fragt: Wie testet man diese Skills laut Forschung am besten?
+    Welche Persönlichkeitsmerkmale unterscheiden gute von schlechten Kandidaten?
+    Welche Szenario-Typen liefern die besten Datenpunkte?
+    """
+    
+    skills_text = ""
+    for i, skill in enumerate(skills[:7], 1):
+        name = skill.get("name", "?")
+        kat = skill.get("kategorie", "?")
+        skills_text += f"\n{i}. {name} ({kat})"
+    
+    beschreibung_text = ""
+    if job_beschreibung:
+        beschreibung_text = f"\nKlarifizierung: {job_beschreibung}"
+    
+    response = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=4000,
+        messages=[{"role": "user", "content": f"""Du bist ein Experte für Eignungsdiagnostik und psychologische Testverfahren.
+
+Zieljob: "{zieljob}" in "{branche}"{beschreibung_text}
+
+Diese Skills wurden als relevant identifiziert:{skills_text}
+
+Deine Aufgabe — recherchiere für JEDEN Skill:
+
+### 1. Persönlichkeitsforschung
+Was sagt die Forschung (Hogan, Big Five, DISC, BIP etc.) darüber, welche Persönlichkeitsmerkmale bei DIESEM Skill den Unterschied zwischen gut und schlecht machen?
+- Welche Traits korrelieren mit Erfolg in diesem Skill?
+- Welche Dark-Side-Traits führen zum Scheitern?
+- Gibt es bekannte Studien oder Benchmarks?
+
+### 2. Diagnostische Strategie
+Wie misst man diesen Skill am besten OHNE dass der Kandidat es merkt?
+- Welche Methode eignet sich? (Statement, Forced Choice, Szenario, Ranking)
+- Welche ALLTAGS-Situation wäre ein guter Proxy?
+- Was ist der häufigste Fehler bei der Messung dieses Skills?
+
+### 3. Differenzierungs-Dimensionen
+Welche 2-4 Verhaltensstrategien gibt es bei diesem Skill?
+Beispiel für "Führungskompetenz":
+- Strategie A: Autoritär/Entscheidungsfreudig
+- Strategie B: Demokratisch/Konsensorientiert  
+- Strategie C: Coaching/Entwicklungsorientiert
+- Strategie D: Laissez-faire/Delegierend
+→ KEINE ist "besser", aber jede passt zu einem anderen Kontext.
+
+### 4. Anti-Durchschaubarkeit
+Wie formuliert man Fragen so, dass der Kandidat NICHT erraten kann was gemessen wird?
+Welche Fallen vermeiden gute Diagnostiker?
+
+Antworte NUR mit JSON:
+{{
+  "skills_diagnostik": [
+    {{
+      "skill": "Skill-Name",
+      "persoenlichkeit": {{
+        "erfolgs_traits": ["Trait 1", "Trait 2"],
+        "dark_side_traits": ["Trait 1", "Trait 2"],
+        "forschung": "Was sagt die Forschung (1-2 Sätze)"
+      }},
+      "diagnostik_strategie": {{
+        "beste_methode": "statement / forced_choice / szenario",
+        "alltags_proxy": "Welche Alltagssituation misst das am besten",
+        "haeufigster_fehler": "Was man vermeiden muss"
+      }},
+      "dimensionen": [
+        {{
+          "name": "Strategie A",
+          "beschreibung": "Was diese Strategie bedeutet",
+          "wann_gut": "In welchem Kontext das die beste Strategie ist"
+        }}
+      ],
+      "anti_durchschaubarkeit": "Tipp wie man es unsichtbar misst"
+    }}
+  ],
+  "allgemeine_tipps": [
+    "Übergreifende Empfehlungen für diesen Zieljob"
+  ],
+  "meta": {{
+    "quellen": ["Hogan", "Big Five", etc.],
+    "vertrauen": "hoch/mittel/niedrig"
+  }}
+}}"""}]
+    )
+    
+    return parse_json_response(response.content[0].text.strip())
+
+
 def get_json_template():
     return """{
   "skills": [

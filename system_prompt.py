@@ -362,7 +362,8 @@ Das _meta-Feld wird NICHT an den User gezeigt — es ist nur für dein internes 
 
 def build_system_prompt(zieljob: str, aktueller_job: str, branche: str, skills: list[dict],
                          researched_skills: list[dict] | None = None,
-                         varianz_antworten: list[dict] | None = None) -> str:
+                         varianz_antworten: list[dict] | None = None,
+                         diagnostik_strategy: dict | None = None) -> str:
     """Baut den vollständigen System-Prompt mit Job-Kontext."""
     
     if researched_skills:
@@ -373,6 +374,8 @@ def build_system_prompt(zieljob: str, aktueller_job: str, branche: str, skills: 
         for i, skill in enumerate(skills, 1):
             skills_text += f"\n{i}. **{skill['name']}** — {skill['begruendung']}"
         varianz_text = ""
+    
+    diagnostik_text = build_diagnostik_context(diagnostik_strategy) if diagnostik_strategy else ""
     
     context = f"""
 
@@ -385,6 +388,7 @@ def build_system_prompt(zieljob: str, aktueller_job: str, branche: str, skills: 
 ## Skills für {zieljob} ({branche})
 {skills_text}
 {varianz_text}
+{diagnostik_text}
 
 DEIN PLAN FÜR DIESE SESSION:
 
@@ -402,6 +406,63 @@ Beginne jetzt mit dem Intro (agent_message), dann das erste Statement.
 """
     
     return SYSTEM_PROMPT + context
+
+
+def build_diagnostik_context(diagnostik: dict) -> str:
+    """Baut Diagnostik-Strategie-Kontext für den System Prompt."""
+    if not diagnostik:
+        return ""
+    
+    skills_diag = diagnostik.get("skills_diagnostik", [])
+    if not skills_diag:
+        return ""
+    
+    text = "\n## DIAGNOSTIK-STRATEGIE (aus Persönlichkeitsforschung)\n"
+    text += "\nDiese Strategien wurden speziell für diesen Zieljob recherchiert. NUTZE SIE!\n"
+    
+    for sd in skills_diag[:5]:
+        skill = sd.get("skill", "?")
+        pers = sd.get("persoenlichkeit", {})
+        strat = sd.get("diagnostik_strategie", {})
+        dims = sd.get("dimensionen", [])
+        anti = sd.get("anti_durchschaubarkeit", "")
+        
+        text += f"\n### {skill}"
+        
+        if pers.get("erfolgs_traits"):
+            text += f"\n  Erfolgs-Traits: {', '.join(pers['erfolgs_traits'])}"
+        if pers.get("dark_side_traits"):
+            text += f"\n  Dark-Side-Traits: {', '.join(pers['dark_side_traits'])}"
+        if pers.get("forschung"):
+            text += f"\n  Forschung: {pers['forschung']}"
+        
+        if strat.get("beste_methode"):
+            text += f"\n  Beste Methode: {strat['beste_methode']}"
+        if strat.get("alltags_proxy"):
+            text += f"\n  Alltags-Proxy: {strat['alltags_proxy']}"
+        if strat.get("haeufigster_fehler"):
+            text += f"\n  ⚠️ VERMEIDE: {strat['haeufigster_fehler']}"
+        
+        if dims:
+            text += "\n  Dimensionen (für Szenario-Optionen):"
+            for d in dims[:4]:
+                name = d.get("name", "?")
+                beschr = d.get("beschreibung", "")
+                text += f"\n    - {name}: {beschr}"
+        
+        if anti:
+            text += f"\n  Anti-Durchschaubarkeit: {anti}"
+    
+    tipps = diagnostik.get("allgemeine_tipps", [])
+    if tipps:
+        text += "\n\n### Allgemeine Diagnostik-Tipps:\n"
+        for t in tipps:
+            text += f"- {t}\n"
+    
+    text += "\n\n→ NUTZE diese Strategien für deine Statements und Szenarien!"
+    text += "\n→ Die Dimensionen sind deine Szenario-Optionen: Jede Option = eine andere Strategie.\n"
+    
+    return text
 
 
 def build_researched_skills_context(researched_skills: list[dict]) -> str:

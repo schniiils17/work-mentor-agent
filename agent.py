@@ -55,7 +55,8 @@ async def generate_skills(zieljob: str, aktueller_job: str, branche: str) -> lis
 async def start_session(session_id: str, zieljob: str, aktueller_job: str, 
                          branche: str, skills: list[Skill] | None = None,
                          researched_skills: list[ResearchedSkill] | None = None,
-                         varianz_antworten: list[VarianzAntwort] | None = None) -> dict:
+                         varianz_antworten: list[VarianzAntwort] | None = None,
+                         diagnostik_strategy: dict | None = None) -> dict:
     """Startet eine neue Assessment-Session."""
     
     # Skills aus Research übernehmen oder generieren
@@ -78,7 +79,8 @@ async def start_session(session_id: str, zieljob: str, aktueller_job: str,
             branche=branche,
             skills=[s.model_dump() for s in skills],
             researched_skills=[rs.model_dump() for rs in researched_skills],
-            varianz_antworten=[va.model_dump() for va in varianz_antworten] if varianz_antworten else None
+            varianz_antworten=[va.model_dump() for va in varianz_antworten] if varianz_antworten else None,
+            diagnostik_strategy=diagnostik_strategy
         )
     else:
         if not skills:

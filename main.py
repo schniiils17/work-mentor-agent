@@ -8,9 +8,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from models import StartRequest, AnswerRequest, ContinueRequest, SkillResearchRequest, JobClarifyRequest
+from models import StartRequest, AnswerRequest, ContinueRequest, SkillResearchRequest, JobClarifyRequest, DiagnostikStrategyRequest
 from agent import start_session, process_answer, continue_after_magic, sessions
-from skill_research import research_skills, clarify_job
+from skill_research import research_skills, clarify_job, research_diagnostik_strategy
 
 # .env laden
 load_dotenv()
@@ -67,6 +67,26 @@ async def api_job_clarify(req: JobClarifyRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/skills/diagnostik")
+async def api_diagnostik_strategy(req: DiagnostikStrategyRequest):
+    """
+    Recherchiert die beste diagnostische Strategie pro Skill.
+    
+    Schickt: zieljob, branche, skills (aus Research), job_beschreibung
+    Bekommt: Pro Skill: Persönlichkeitsforschung, Teststrategie, Dimensionen
+    """
+    try:
+        result = await research_diagnostik_strategy(
+            zieljob=req.zieljob,
+            branche=req.branche,
+            skills=req.skills,
+            job_beschreibung=req.job_beschreibung
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/skills/research")
 async def api_skill_research(req: SkillResearchRequest):
     """
@@ -103,7 +123,8 @@ async def api_start(req: StartRequest):
             branche=req.branche,
             skills=req.skills,
             researched_skills=req.researched_skills,
-            varianz_antworten=req.varianz_antworten
+            varianz_antworten=req.varianz_antworten,
+            diagnostik_strategy=req.diagnostik_strategy
         )
         return result
     except Exception as e:
