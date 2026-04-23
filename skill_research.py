@@ -14,18 +14,50 @@ client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 JOOBLE_API_KEY = os.getenv("JOOBLE_API_KEY", "")
 
 
+async def generate_search_queries(zieljob: str, branche: str) -> list[str]:
+    """Lässt Claude smarte Suchbegriffe für Jobbörsen generieren."""
+    response = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=500,
+        messages=[{"role": "user", "content": f"""Du bist ein Recruiter der auf Jobbörsen nach Stellen sucht.
+
+Zieljob: "{zieljob}" in "{branche}"
+
+Generiere 3-5 verschiedene Suchbegriffe die ein Recruiter auf Stepstone/Indeed eingeben würde um GENAU diese Position zu finden.
+
+Wichtig:
+- Verwende Synonyme und alternative Jobtitel
+- Denke an das was der User WIRKLICH meint (z.B. "Leiter digitaler Vertrieb" = Vertriebsleiter der digitale Kanäle nutzt, NICHT Digital Marketing Manager)
+- Jeder Suchbegriff max 3-4 Wörter
+- Wenn eine Branche angegeben ist, nutze sie bei 1-2 Queries
+
+Antworte NUR mit einem JSON-Array von Strings:
+["Suchbegriff 1", "Suchbegriff 2", "Suchbegriff 3"]"""}]
+    )
+    try:
+        text = response.content[0].text.strip()
+        if text.startswith("```"):
+            text = text.split("```")[1]
+            if text.startswith("json"): text = text[4:]
+            text = text.strip()
+        queries = json.loads(text)
+        if isinstance(queries, list) and all(isinstance(q, str) for q in queries):
+            return queries[:5]
+    except Exception:
+        pass
+    # Fallback
+    return [f"{zieljob} {branche}", zieljob]
+
+
 async def fetch_jooble_jobs(zieljob: str, branche: str, count: int = 50) -> list[dict]:
-    """Holt echte Stellenanzeigen von Jooble API."""
+    """Holt echte Stellenanzeigen von Jooble API mit smarten Suchbegriffen."""
     if not JOOBLE_API_KEY:
         return []
     
     url = f"https://de.jooble.org/api/{JOOBLE_API_KEY}"
     
-    # Mehrere Suchanfragen für bessere Abdeckung
-    queries = [
-        f"{zieljob} {branche}",
-        f"{zieljob}",
-    ]
+    # Claude generiert smarte Suchbegriffe
+    queries = await generate_search_queries(zieljob, branche)
     
     all_jobs = []
     seen_titles = set()
@@ -69,13 +101,61 @@ async def fetch_jooble_jobs(zieljob: str, branche: str, count: int = 50) -> list
     return all_jobs
 
 
+async def filter_relevant_jobs(jobs: list[dict], zieljob: str, branche: str) -> list[dict]:
+    """Lässt Claude die wirklich relevanten Stellen auswählen."""
+    if len(jobs) <= 5:
+        return jobs
+    
+    # Kompakte Job-Liste für Claude
+    job_list = ""
+    for i, job in enumerate(jobs[:50]):
+        title = job.get("title", "?")
+        snippet = re.sub(r'<[^>]+>', '', job.get("snippet", "")).strip()[:150]
+        job_list += f"{i}: {title} | {snippet}\n"
+    
+    response = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=500,
+        messages=[{"role": "user", "content": f"""Zieljob des Users: "{zieljob}" in "{branche}"
+
+Hier sind Stellenanzeigen von Jobbörsen. Wähle NUR die Stellen aus die WIRKLICH zu diesem Zieljob passen.
+
+Wichtig: 
+- "Leiter digitaler Vertrieb" = Führungskraft die ein Vertriebsteam leitet (das digital verkauft), NICHT Digital Marketing Manager oder E-Commerce Manager
+- "Vertriebsleiter" = Führt Verkäufer, NICHT Key Account Manager
+- Achte auf den KERN des Jobs, nicht nur auf Keywords im Titel
+
+Stellen:
+{job_list}
+
+Antworte NUR mit einem JSON-Array der Indizes der relevanten Stellen:
+[0, 3, 7, 12]"""}]
+    )
+    try:
+        text = response.content[0].text.strip()
+        if text.startswith("```"):
+            text = text.split("```")[1]
+            if text.startswith("json"): text = text[4:]
+            text = text.strip()
+        indices = json.loads(text)
+        if isinstance(indices, list):
+            return [jobs[i] for i in indices if isinstance(i, int) and 0 <= i < len(jobs)]
+    except Exception:
+        pass
+    return jobs[:20]  # Fallback: erste 20
+
+
 async def research_skills(zieljob: str, branche: str, aktueller_job: str) -> dict:
     """Recherchiert Skills aus echten Stellenanzeigen + generiert Kalibrierungs-Fragen."""
 
     # SCHRITT 1: Echte Stellen von Jooble holen
     jobs = await fetch_jooble_jobs(zieljob, branche, count=50)
     
-    has_real_jobs = len(jobs) >= 5
+    # SCHRITT 1.5: Relevanz-Filter — nur Stellen die wirklich passen
+    if len(jobs) >= 5:
+        jobs = await filter_relevant_jobs(jobs, zieljob, branche)
+    
+    has_real_jobs = len(jobs) >= 3
     
     # SCHRITT 2: Claude analysiert
     if has_real_jobs:
@@ -95,6 +175,7 @@ async def research_skills(zieljob: str, branche: str, aktueller_job: str) -> dic
     if "meta" not in result:
         result["meta"] = {}
     result["meta"]["stellenanzeigen_geladen"] = len(jobs)
+    result["meta"]["stellenanzeigen_relevant"] = len(jobs)  # nach Filter
     result["meta"]["quelle"] = "jooble" if has_real_jobs else "claude_fallback"
     
     return result
