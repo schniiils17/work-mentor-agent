@@ -8,9 +8,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from models import StartRequest, AnswerRequest, ContinueRequest, SkillResearchRequest
+from models import StartRequest, AnswerRequest, ContinueRequest, SkillResearchRequest, JobClarifyRequest
 from agent import start_session, process_answer, continue_after_magic, sessions
-from skill_research import research_skills
+from skill_research import research_skills, clarify_job
 
 # .env laden
 load_dotenv()
@@ -48,6 +48,25 @@ async def health():
     return {"status": "healthy", "active_sessions": len(sessions)}
 
 
+@app.post("/api/jobs/clarify")
+async def api_job_clarify(req: JobClarifyRequest):
+    """
+    Prüft ob ein Zieljob eindeutig ist und bietet Interpretationen an.
+    
+    Schickt: zieljob, branche (optional), aktueller_job (optional)
+    Bekommt: eindeutig (bool) + Interpretationen
+    """
+    try:
+        result = await clarify_job(
+            zieljob=req.zieljob,
+            branche=req.branche,
+            aktueller_job=req.aktueller_job
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/skills/research")
 async def api_skill_research(req: SkillResearchRequest):
     """
@@ -60,7 +79,8 @@ async def api_skill_research(req: SkillResearchRequest):
         result = await research_skills(
             zieljob=req.zieljob,
             branche=req.branche,
-            aktueller_job=req.aktueller_job
+            aktueller_job=req.aktueller_job,
+            job_beschreibung=req.job_beschreibung
         )
         return result
     except Exception as e:

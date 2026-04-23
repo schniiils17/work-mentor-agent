@@ -52,10 +52,17 @@ class ContinueRequest(BaseModel):
     session_id: str  # Nach agent_message: "weiter bitte"
 
 
+class JobClarifyRequest(BaseModel):
+    zieljob: str
+    branche: str = ""
+    aktueller_job: str = ""
+
+
 class SkillResearchRequest(BaseModel):
     zieljob: str
     branche: str
     aktueller_job: str
+    job_beschreibung: str = ""  # Klarifizierte Job-Beschreibung von /api/jobs/clarify
 
 
 class SessionState(BaseModel):

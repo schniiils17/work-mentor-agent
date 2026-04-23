@@ -14,6 +14,58 @@ client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 JOOBLE_API_KEY = os.getenv("JOOBLE_API_KEY", "")
 
 
+async def clarify_job(zieljob: str, branche: str = "", aktueller_job: str = "") -> dict:
+    """Prüft ob der Zieljob eindeutig ist und bietet Interpretationen an."""
+    
+    branche_text = f" in der Branche '{branche}'" if branche else ""
+    aktueller_text = f" (aktuell: {aktueller_job})" if aktueller_job else ""
+    
+    response = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=1500,
+        messages=[{"role": "user", "content": f"""Ein User hat als Zieljob eingegeben: "{zieljob}"{branche_text}{aktueller_text}
+
+Analysiere diesen Jobtitel:
+
+1. Ist der Jobtitel EINDEUTIG oder kann er VERSCHIEDENE Dinge bedeuten?
+2. Wenn mehrdeutig: Welche 2-4 verschiedenen Interpretationen gibt es?
+
+Beispiele für Mehrdeutigkeit:
+- "Leiter digitaler Vertrieb" könnte sein:
+  a) Führungskraft die ein Vertriebsteam leitet, das über digitale Kanäle verkauft
+  b) E-Commerce/Online-Marketing Manager der den digitalen Kanal verantwortet
+  c) Head of Digital Sales der die Digitalstrategie im Vertrieb entwickelt
+
+- "Vertriebsleiter" ist relativ eindeutig: Führungskraft die ein Vertriebsteam leitet
+
+- "Projektmanager" könnte sein:
+  a) IT-Projektmanager (Software-Projekte)
+  b) Bau-Projektleiter (Bauprojekte)
+  c) Marketing-Projektmanager
+
+Antworte NUR mit JSON:
+{{
+  "eindeutig": true/false,
+  "erkannt_als": "Kurze Beschreibung was du glaubst was gemeint ist (1 Satz)",
+  "interpretationen": [
+    {{
+      "titel": "Kurzer prägnanter Titel",
+      "beschreibung": "Was genau diese Interpretation bedeutet (1-2 Sätze, Du-Form)",
+      "suchbegriffe": ["Suchbegriff 1", "Suchbegriff 2"],
+      "kernaufgaben": ["Aufgabe 1", "Aufgabe 2", "Aufgabe 3"]
+    }}
+  ]
+}}
+
+Wenn eindeutig=true: Gib trotzdem 1 Interpretation (die offensichtliche).
+Wenn eindeutig=false: Gib 2-4 Interpretationen, die sich WIRKLICH unterscheiden.
+
+Wichtig: Die Interpretationen müssen sich in den KERN-AUFGABEN unterscheiden, nicht nur im Titel."""}]
+    )
+    
+    return parse_json_response(response.content[0].text.strip())
+
+
 async def generate_search_queries(zieljob: str, branche: str) -> list[str]:
     """Lässt Claude smarte Suchbegriffe für Jobbörsen generieren."""
     response = client.messages.create(
@@ -145,7 +197,7 @@ Antworte NUR mit einem JSON-Array der Indizes der relevanten Stellen:
     return jobs[:20]  # Fallback: erste 20
 
 
-async def research_skills(zieljob: str, branche: str, aktueller_job: str) -> dict:
+async def research_skills(zieljob: str, branche: str, aktueller_job: str, job_beschreibung: str = "") -> dict:
     """Recherchiert Skills aus echten Stellenanzeigen + generiert Kalibrierungs-Fragen."""
 
     # SCHRITT 1: Echte Stellen von Jooble holen
@@ -159,9 +211,9 @@ async def research_skills(zieljob: str, branche: str, aktueller_job: str) -> dic
     
     # SCHRITT 2: Claude analysiert
     if has_real_jobs:
-        prompt = build_prompt_with_jobs(zieljob, branche, aktueller_job, jobs)
+        prompt = build_prompt_with_jobs(zieljob, branche, aktueller_job, jobs, job_beschreibung)
     else:
-        prompt = build_prompt_fallback(zieljob, branche, aktueller_job, jobs)
+        prompt = build_prompt_fallback(zieljob, branche, aktueller_job, jobs, job_beschreibung)
 
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
@@ -181,8 +233,12 @@ async def research_skills(zieljob: str, branche: str, aktueller_job: str) -> dic
     return result
 
 
-def build_prompt_with_jobs(zieljob, branche, aktueller_job, jobs):
+def build_prompt_with_jobs(zieljob, branche, aktueller_job, jobs, job_beschreibung=""):
     """Prompt mit ECHTEN Stellenanzeigen."""
+    
+    klarifizierung = ""
+    if job_beschreibung:
+        klarifizierung = f"\n\n## WICHTIG: Der User hat klarifiziert was er meint:\n\"{job_beschreibung}\"\nAlle Skills und Fragen müssen sich auf DIESE Interpretation beziehen!\n"
     
     # Jobs als kompakten Text formatieren
     jobs_text = ""
@@ -206,7 +262,7 @@ def build_prompt_with_jobs(zieljob, branche, aktueller_job, jobs):
     return f"""Du bist ein Arbeitsmarkt-Analyst der ECHTE Stellenanzeigen auswertet.
 
 Position: "{zieljob}" in "{branche}". User ist aktuell "{aktueller_job}".
-
+{klarifizierung}
 ## {len(jobs)} ECHTE Stellenanzeigen (gerade live von Jobbörsen geholt):
 
 {jobs_text}
@@ -245,8 +301,12 @@ Antworte NUR mit JSON:
 """
 
 
-def build_prompt_fallback(zieljob, branche, aktueller_job, partial_jobs=None):
+def build_prompt_fallback(zieljob, branche, aktueller_job, partial_jobs=None, job_beschreibung=""):
     """Fallback wenn zu wenige Stellen gefunden."""
+    
+    klarifizierung = ""
+    if job_beschreibung:
+        klarifizierung = f"\nWICHTIG: Der User hat klarifiziert was er meint: \"{job_beschreibung}\"\n"
     
     partial_text = ""
     if partial_jobs:
@@ -257,7 +317,7 @@ def build_prompt_fallback(zieljob, branche, aktueller_job, partial_jobs=None):
     
     return f"""Du bist ein Arbeitsmarkt-Experte.
 Position: "{zieljob}" in "{branche}". User ist aktuell "{aktueller_job}".
-
+{klarifizierung}
 {"Teilweise Daten gefunden:" + partial_text if partial_text else "Keine Live-Daten verfügbar."}
 
 Nutze dein Wissen über ECHTE Stellenanzeigen für diese Position.
