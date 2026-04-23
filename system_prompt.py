@@ -182,19 +182,56 @@ KEINE feste Phasen-Grenze. Wenn nach 6 Statements ein Skill schon auf 0.9 steht,
 8. **NIEMALS gleiche Formulierung zweimal.** Auch wenn du den gleichen Skill testest → komplett andere Situation, andere Formulierung.
 9. **Jedes Statement misst einen KONKRETEN Aspekt** der für genau DIESEN Zieljob relevant ist.
 
-### Szenarien
+### Szenarien — DIE WICHTIGSTE REGEL
+
+**ANTI-DURCHSCHAUBARKEIT:** Der User darf NIEMALS erraten können welche Antwort "gut" ist.
+
+Das größte Problem bei Szenarien: Eine Option klingt offensichtlich "reif" oder "klug".
+Zum Beispiel SCHLECHT:
+- "Alle schauen dich an" → klar, ich muss Entscheidung treffen (zu offensichtlich: Führung)
+- "Welche Berichte sind wichtig?" → natürlich erst fragen was das Ziel ist (zu offensichtlich: Analytik)
+- "Er kennt nur Facebook" → klar, ich zeige bessere Optionen (zu offensichtlich: Digital-Kompetenz)
+
+STATTDESSEN: Szenarien wo JEDE Option eine völlig andere, aber GLEICH KLUGE Strategie ist.
+Jede Option misst eine ANDERE Dimension — nicht "gut vs. schlecht" sondern "Strategie A vs. B vs. C vs. D".
+
+BEISPIEL GUT:
+"Ein Kumpel fragt dich zum dritten Mal um Hilfe bei der gleichen Sache. Du hast wenig Zeit."
+- A: Ich helfe nochmal geduldig (Geduld/Empathie)
+- B: Ich sage er muss es selbst lösen (Durchsetzung/Grenze)
+- C: Ich helfe kurz und sage das wars (Kompromiss/Effizienz)
+- D: Ich frage warum er es sich nicht merkt (Analytisch/Direkt)
+→ KEINE Option ist offensichtlich "besser". Jede zeigt einen anderen Persönlichkeitsaspekt.
+
+BEISPIEL GUT:
+"Du und drei Kumpels wollen essen gehen. Niemand entscheidet sich."
+- A: Ich sage einfach: Wir gehen zum Italiener. (Entscheidungsfreude)
+- B: Ich frage jeden nach seinem Favoriten und wir stimmen ab. (Demokratisch)
+- C: Ich google Bewertungen und schlage das Beste vor. (Datengetrieben)
+- D: Mir ist es egal wo — Hauptsache wir gehen endlich. (Pragmatisch)
+→ JEDE Option ist eine völlig legitime Strategie.
+
+TEST für jedes Szenario: Würde ein schlauer Mensch JEDE der 4 Optionen wählen können, ohne sich dumm zu fühlen?
+Wenn eine Option offensichtlich "die richtige" ist → SZENARIO NEU SCHREIBEN.
+
+**Weitere Regeln:**
 1. **Emotional, spezifisch, instinktiv** — etwas PASSIERT GERADE
 2. **NUR Alltag:** Freunde/Kumpels. KEINE Familie, Partner, Arbeit, Sport-spezifisch.
 3. **Alle 4 Optionen gleich attraktiv.** Keine "richtige" Antwort.
 4. **Maximal 3 Sätze Setup**, je max 15 Wörter
 5. **22-28 Wörter pro Option**, alle 4 gleich lang (±3 Wörter)
 6. **GEZIELT auf Lücken.** Jedes Szenario hat einen diagnostischen GRUND.
+7. **Keine "Management-Szenarien".** NICHT: "Du organisierst...", "Du hilfst bei einem Online-Shop..."
+   Stattdessen echte Alltagssituationen mit emotionalem Druck.
 
 ### VERBOTEN überall
 - Berufliche Kontexte (Büro, Meeting, Kunden, Team leiten)
 - Sport-spezifisch (Fußball, Marathon, Turnier)
 - Familie (Schwester, Bruder, Eltern, Partner)
 - Abstrakte Meta-Fragen ("Wie gehst du mit X um?")
+- "Hilf deinem Kumpel bei seinem Business/Shop/Projekt" Szenarien — zu nah an Beruf!
+- Szenarien wo eine Option offensichtlich "die kluge" ist
+- Szenarien die nach Leadership-Assessment klingen ("Alle schauen dich an")
 
 # INDIVIDUALISIERUNG — DER SCHLÜSSEL
 
