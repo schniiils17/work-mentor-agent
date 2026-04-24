@@ -34,8 +34,8 @@ class VarianzAntwort(BaseModel):
 class StartRequest(BaseModel):
     session_id: str
     zieljob: str
-    aktueller_job: str
-    branche: str
+    aktueller_job: str = ""
+    branche: str = ""
     skills: Optional[list[Skill]] = None  # Legacy: einfache Skills
     researched_skills: Optional[list[ResearchedSkill]] = None  # NEU: aus Skill-Research
     varianz_antworten: Optional[list[VarianzAntwort]] = None  # NEU: Antworten auf Rückfragen
@@ -68,8 +68,8 @@ class DiagnostikStrategyRequest(BaseModel):
 
 class SkillResearchRequest(BaseModel):
     zieljob: str
-    branche: str
-    aktueller_job: str
+    branche: str = ""
+    aktueller_job: str = ""
     job_beschreibung: str = ""  # Klarifizierte Job-Beschreibung von /api/jobs/clarify
 
 
@@ -91,8 +91,8 @@ class ItemsRequest(BaseModel):
 class EvaluateRequest(BaseModel):
     session_id: str
     zieljob: str
-    aktueller_job: str
-    branche: str
+    aktueller_job: str = ""
+    branche: str = ""
     job_beschreibung: str = ""
     researched_skills: Optional[list[ResearchedSkill]] = None
     varianz_antworten: Optional[list[VarianzAntwort]] = None
