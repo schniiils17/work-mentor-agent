@@ -288,7 +288,12 @@ REGELN:
 - 4-7 Fragen — lieber eine zu viel als den Job falsch zu verstehen
 - Jede Frage hat 2-3 inhaltliche Optionen PLUS eine Ausweichoption ("Beides", "Gemischt")
 - Du-Form, einfache Sprache, keine HR-Fachbegriffe
-- Jede Option verändert die Skill-Gewichtung MESSBAR
+- Jede Option verändert die Skill-Gewichtung
+- WICHTIG: Die Fragen beschreiben die POSITION, nicht die Präferenzen des Users!
+  FALSCH: "Welche Sparte INTERESSIERT dich?" / "Was REIZT dich mehr?"
+  RICHTIG: "Wie ist die Position ausgelegt?" / "Was würde dein Alltag sein?"
+  Der User beschreibt den JOB, nicht seine Wünsche.
+  Formuliere: "Wie würde dein Team aussehen?" statt "Welche Teamgröße strebst du an?" MESSBAR
 
 Antworte NUR mit JSON:
 {get_json_template()}
@@ -337,6 +342,11 @@ REGELN:
 - Du-Form, einfache Sprache
 - 2-3 Optionen + Ausweichoption pro Frage
 - Jede Option verändert die Skill-Gewichtung
+- WICHTIG: Die Fragen beschreiben die POSITION, nicht die Präferenzen des Users!
+  FALSCH: "Welche Sparte INTERESSIERT dich?" / "Was REIZT dich mehr?"
+  RICHTIG: "Wie ist die Position ausgelegt?" / "Was würde dein Alltag sein?"
+  Der User beschreibt den JOB, nicht seine Wünsche.
+  Formuliere: "Wie würde dein Team aussehen?" statt "Welche Teamgröße strebst du an?"
 
 Antworte NUR mit JSON:
 {get_json_template()}
@@ -449,7 +459,7 @@ def get_json_template():
   ],
   "varianz_fragen": [
     {
-      "frage": "Deine Rückfrage an den User (Du-Form)",
+      "frage": "Frage über die POSITION, nicht über Präferenzen (Du-Form). Z.B. 'Wie groß wäre dein Team in dieser Position?'",
       "grund": "In X von Y Anzeigen steht A, in Z steht B — darum müssen wir fragen",
       "beeinflusst_skills": ["Skill 1", "Skill 2"],
       "optionen": [
