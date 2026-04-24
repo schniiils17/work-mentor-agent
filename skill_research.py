@@ -15,20 +15,22 @@ JOOBLE_API_KEY = os.getenv("JOOBLE_API_KEY", "")
 
 
 async def clarify_job(zieljob: str, branche: str = "", aktueller_job: str = "") -> dict:
-    """Runde 1: Zeigt die wahrscheinlichste Interpretation und fragt 'Passt das?'"""
+    """Runde 1: Zeigt die wahrscheinlichste Interpretation mit Kernaufgaben."""
     
     branche_text = f" in der Branche '{branche}'" if branche else ""
     aktueller_text = f" (aktuell: {aktueller_job})" if aktueller_job else ""
     
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
-        max_tokens=1500,
+        max_tokens=2000,
         messages=[{"role": "user", "content": f"""Ein User hat als Zieljob eingegeben: "{zieljob}"{branche_text}{aktueller_text}
 
 Deine Aufgabe:
 1. Was ist die WAHRSCHEINLICHSTE Interpretation dieses Jobtitels?
 2. Erstelle eine klare, kurze Beschreibung (2-3 Sätze, Du-Form, einfache Sprache)
-3. Generiere 2-3 alternative Interpretationen für den Fall dass Runde 1 nicht passt
+3. Liste 4-6 KERNAUFGABEN auf die diesen Job ausmachen
+4. Generiere 2-3 alternative Interpretationen für den Fall dass Runde 1 komplett falsch ist
+5. Generiere 4-6 ZUSATZ-AUFGABEN die je nach Position dazugehören KÖNNTEN (für Feinjustierung)
 
 WICHTIG bei der Interpretation:
 - Denke vom KERN des Jobs: Was macht man den ganzen Tag?
@@ -42,19 +44,28 @@ Antworte NUR mit JSON:
   "hauptinterpretation": {{
     "titel": "Kurzer Titel (3-5 Wörter)",
     "beschreibung": "2-3 Sätze was dieser Job bedeutet. Du-Form. Einfache Sprache. Fokus auf: Was machst du den ganzen Tag? Wen führst du? Was ist dein Ziel?",
+    "kernaufgaben": ["Aufgabe 1", "Aufgabe 2", "Aufgabe 3", "Aufgabe 4"],
     "suchbegriffe": ["Suchbegriff für Jobbörse 1", "Suchbegriff 2"]
   }},
+  "zusatz_aufgaben": [
+    "Aufgabe die je nach Position dazugehören könnte",
+    "Weitere optionale Aufgabe"
+  ],
   "alternativen": [
     {{
       "titel": "Alternativer Titel",
       "beschreibung": "Was diese Alternative anders macht (1-2 Sätze, Du-Form)",
+      "kernaufgaben": ["Andere Aufgabe 1", "Andere Aufgabe 2"],
       "suchbegriffe": ["Suchbegriff 1", "Suchbegriff 2"]
     }}
   ]
 }}
 
-Gib IMMER 2-3 Alternativen — auch wenn der Job ziemlich eindeutig scheint.
-Die Alternativen müssen sich im KERN unterscheiden (andere Aufgaben, andere Rolle)."""}]
+Kernaufgaben = Was man SICHER in diesem Job macht (z.B. "Vertriebsteam führen und coachen")
+Zusatz-Aufgaben = Was je nach Unternehmen DAZUKOMMEN könnte (z.B. "Eigene Kunden betreuen", "Budget verantworten")
+Alternativen = Komplett ANDERE Jobs die der Titel auch meinen könnte
+
+Gib IMMER 2-3 Alternativen und 4-6 Zusatz-Aufgaben."""}]
     )
     
     return parse_json_response(response.content[0].text.strip())
