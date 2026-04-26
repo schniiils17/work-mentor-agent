@@ -83,6 +83,7 @@ Erstelle ein Ergebnis das die 7 GEMESSENEN Persönlichkeitsdimensionen im Kontex
 5. **Sprache:** Du-Form, einfach, Berufsschulniveau. Kein HR-Jargon. NUR Deutsch. NIEMALS "als wie" — immer "als" ODER "wie".
 
 6. **Bewertung pro Dimension:** Überlege für JEDE Dimension: Wie wichtig ist sie für "{zieljob}"? Wie hoch SOLLTE sie sein? Wie hoch IST sie? Die Lücke bestimmt den Score.
+7. **Bewertungs-Labels:** Verwende NUR diese 4 Labels: "Sehr stark", "Stark", "Ausgeglichen", "Entwicklungsbedarf". NICHT "Ausreichend" (klingt wie Schulnote 4), NICHT "Gut", NICHT "Lücke".
 
 ### DIMENSIONS-BEWERTUNG:
 Für jede der 7 Dimensionen:
