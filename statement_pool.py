@@ -121,7 +121,7 @@ STATEMENTS = [
     {
         "id": "E3",
         "typ": "statement",
-        "text": "Mir ist das Ergebnis wichtiger als wie sich die Leute dabei fühlen.",
+        "text": "Mir ist das Ergebnis wichtiger als dass sich alle dabei gut fühlen.",
         "dimension": "empathie",
         "richtung": "A_niedrig",
     },

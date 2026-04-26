@@ -80,10 +80,14 @@ Erstelle ein Ergebnis das die 7 GEMESSENEN Persönlichkeitsdimensionen im Kontex
 
 4. **Überraschende Verbindungen!** Der Mehrwert ist NICHT "du bist empathisch". Der Mehrwert ist: "Deine hohe Empathie + niedrige Durchsetzung = du wirst genau wissen dass dein Mitarbeiter Mist baut, aber nichts sagen. Das frisst dich auf."
 
-5. **Sprache:** Du-Form, einfach, Berufsschulniveau. Kein HR-Jargon. NUR Deutsch. NIEMALS "als wie" — immer "als" ODER "wie".
+5. **Sprache:** Du-Form, einfach, Berufsschulniveau. Kein HR-Jargon. NUR Deutsch.
+   - NIEMALS "als wie" — immer NUR "als" ODER NUR "wie". Beispiel: "besser als andere" ✓, "besser wie andere" ✓ (umgangssprache), "besser als wie andere" ✗ VERBOTEN.
+   - Schreibe "dass" mit Doppel-s.
+
+6. **KEINE HALLUZINATIONEN!** Beziehe dich NUR auf die konkreten Antworten oben. Erfinde KEINE Details über den User (z.B. "dein Schreibtisch ist aufgeräumt", "du liest gerne"). Du weißt NICHTS über den User außer seinen Antworten. Wenn du ein Szenario beschreibst, mache klar dass es eine VORHERSAGE ist ("du wirst wahrscheinlich..."), nicht eine Beobachtung.
 
 6. **Bewertung pro Dimension:** Überlege für JEDE Dimension: Wie wichtig ist sie für "{zieljob}"? Wie hoch SOLLTE sie sein? Wie hoch IST sie? Die Lücke bestimmt den Score.
-7. **Bewertungs-Labels:** Verwende NUR diese 4 Labels: "Sehr stark", "Stark", "Ausgeglichen", "Entwicklungsbedarf". NICHT "Ausreichend" (klingt wie Schulnote 4), NICHT "Gut", NICHT "Lücke".
+8. **Bewertungs-Labels:** Verwende NUR diese 4 Labels: "Sehr stark", "Stark", "Ausgeglichen", "Entwicklungsbedarf". NICHT "Ausreichend" (klingt wie Schulnote 4), NICHT "Gut", NICHT "Lücke".
 
 ### DIMENSIONS-BEWERTUNG:
 Für jede der 7 Dimensionen:

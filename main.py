@@ -116,9 +116,9 @@ async def api_items(req: ItemsRequest):
     Frontend rendert sie — keine KI-Generierung nötig.
     
     Schickt: session_id
-    Bekommt: Liste von 16 Items (12 Statements + 4 Forced Choice)
+    Bekommt: Liste von 21 Items (14 Statements + 7 Forced Choice)
     """
-    items = select_items_for_session(n_statements=12, n_forced=4)
+    items = select_items_for_session(n_statements=14, n_forced=7)
     
     # In Frontend-Format umwandeln
     formatted = []
