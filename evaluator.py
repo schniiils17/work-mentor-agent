@@ -1,7 +1,7 @@
 """
-Work Mentor — Evaluator
-Claude interpretiert Persönlichkeits-Scores im Kontext des Zieljobs.
-Keine Fragen-Generierung — nur Interpretation.
+Work Mentor — Evaluator v2
+Zeigt die 7 GEMESSENEN Dimensionen im Kontext des Zieljobs.
+Keine Fake-Skills — nur was wir tatsächlich gemessen haben.
 """
 
 import json
@@ -23,59 +23,30 @@ async def evaluate_assessment(
     dimension_scores: dict,
     answers: list[dict],
 ) -> dict:
-    """Claude interpretiert die Dimension-Scores im Job-Kontext → Dashboard."""
+    """Claude interpretiert die 7 Dimension-Scores im Job-Kontext → Dashboard."""
     
-    # Scores als lesbaren Text
+    # Scores als lesbaren Text mit allen Details
     scores_text = ""
     for dim_key, score in dimension_scores.items():
         dim = DIMENSIONS.get(dim_key, {})
         label = dim.get("label", dim_key)
         hoch = dim.get("hoch_heisst", "")
         niedrig = dim.get("niedrig_heisst", "")
+        pole = dim.get("pole", ["", ""])
         
+        pct = round(score * 100)
         if score >= 0.7:
-            beschr = f"HOCH ({score}) — {hoch}"
+            beschr = f"HOCH ({pct}%) — {hoch}"
         elif score <= 0.3:
-            beschr = f"NIEDRIG ({score}) — {niedrig}"
+            beschr = f"NIEDRIG ({pct}%) — {niedrig}"
         else:
-            beschr = f"MITTEL ({score}) — Balance zwischen beiden Polen"
+            beschr = f"MITTEL ({pct}%) — Balance zwischen {pole[0]} und {pole[1]}"
         
-        scores_text += f"\n- **{label}**: {beschr}"
-    
-    # Skills als Text
-    skills_text = ""
-    if researched_skills:
-        sorted_skills = sorted(researched_skills, key=lambda s: s.get('gewichtung', 0), reverse=True)
-        for i, skill in enumerate(sorted_skills[:7], 1):
-            name = skill.get('name', '?')
-            gew = skill.get('gewichtung', 0)
-            skills_text += f"\n{i}. {name} (Gewichtung: {gew})"
-    
-    # Varianz-Kontext
-    varianz_text = ""
-    if varianz_antworten:
-        for va in varianz_antworten:
-            varianz_text += f"\n- {va.get('frage', '?')} → {va.get('antwort', '?')}"
-    
-    # Diagnostik-Kontext (wenn vorhanden)
-    diagnostik_text = ""
-    if diagnostik_strategy:
-        skills_diag = diagnostik_strategy.get("skills_diagnostik", [])
-        for sd in skills_diag[:5]:
-            skill = sd.get("skill", "?")
-            pers = sd.get("persoenlichkeit", {})
-            erfolg = pers.get("erfolgs_traits", [])
-            dark = pers.get("dark_side_traits", [])
-            if erfolg or dark:
-                diagnostik_text += f"\n- {skill}: Erfolg={', '.join(erfolg[:3])}. Risiko={', '.join(dark[:3])}"
-    
-    # Job-Beschreibung
-    job_text = f"\nKlarifizierung: {job_beschreibung}" if job_beschreibung else ""
+        scores_text += f"\n- **{label}** ({dim_key}): {beschr}"
     
     # Antwort-Details für spezifische Insights
     answer_details = ""
     for ans in answers[:20]:
-        item_id = ans.get("item_id", "?")
         antwort = ans.get("antwort", "?")
         text = ans.get("item_text", "")
         if text:
@@ -83,107 +54,97 @@ async def evaluate_assessment(
             answer_details += f"\n- \"{text}\" → {antwort_text}"
     
     prompt = f"""Du bist ein erfahrener Eignungsdiagnostiker.
-Ein User hat ein Persönlichkeits-Assessment absolviert.
+Ein User hat ein Persönlichkeits-Assessment absolviert für den Zieljob "{zieljob}".
 
-## Zieljob (DAS bewerten wir!)
-**{zieljob}** in **{branche}**
-
-## Aktueller Job (nur als Hintergrund-Info, NICHT im Dashboard erwähnen!)
-{aktueller_job}
-{job_text}
-
-WICHTIG: Das Dashboard bewertet AUSSCHLIESSLICH die Eignung für den ZIELJOB "{zieljob}".
-Der aktuelle Job "{aktueller_job}" ist NUR Kontext — erwähne ihn NICHT in den Insights.
-Schreibe NICHT "Deine Trainer-Erfahrung" oder "Als {aktueller_job} bringst du...".
-Der User will wissen ob er für den NEUEN Job passt, nicht was er jetzt schon kann.
-
-## Kalibrierung
-{varianz_text if varianz_text else "Keine Kalibrierungsdaten"}
-
-## Recherchierte Skills (aus echten Stellenanzeigen)
-{skills_text if skills_text else "Keine Skills recherchiert"}
-
-## Forschungs-Kontext
-{diagnostik_text if diagnostik_text else "Keine Diagnostik-Strategie"}
-
-## PERSÖNLICHKEITSPROFIL DES USERS
-
+## GEMESSENE DIMENSIONEN (das sind die einzigen Daten die du hast!)
 {scores_text}
 
-## Einzelne Antworten (für spezifische Insights)
+## Einzelne Antworten
 {answer_details}
 
 ## DEINE AUFGABE
 
-Erstelle ein Dashboard das die Persönlichkeit des Users mit den Anforderungen des Zieljobs verbindet.
+Erstelle ein Ergebnis das die 7 GEMESSENEN Persönlichkeitsdimensionen im Kontext des Zieljobs "{zieljob}" interpretiert.
 
-### REGELN:
-1. **Spezifisch!** Kein Barnum-Effekt. Beziehe dich auf KONKRETE Scores und Antworten.
-2. **Ehrlich aber motivierend!** Minimum-Score ist 60%. Niemand unter 60%.
+### WICHTIGE REGELN:
+
+1. **NUR die 7 Dimensionen zeigen!** Du hast NUR Persönlichkeitsdaten. Erfinde KEINE Job-Skills wie "Key Account Management" oder "Budgetplanung". Du weißt nicht ob der User das kann — du weißt nur wie er TICKT.
+
+2. **Jede Dimension durch die Job-Linse erklären.** Nicht "Deine Durchsetzung ist niedrig" (langweilig) sondern "Deine Durchsetzung ist niedrig — als {zieljob} heißt das: du wirst Meetings moderieren können, aber wenn einer nicht liefert wird dir das Kritikgespräch schwerfallen."
+
+3. **Ehrlich aber motivierend.** Minimum Match-Score: 60%.
    - 60-69% = "Solide Basis mit Entwicklungsfeldern"
-   - 70-79% = "Gut vorbereitet für diesen Schritt"
+   - 70-79% = "Gut vorbereitet für diesen Schritt"  
    - 80-89% = "Sehr stark aufgestellt"
-   - 90%+ = Nur bei wirklich perfektem Match
-3. **Überraschend!** Der Mehrwert ist NICHT "du bist empathisch" (das weiß der User). 
-   Der Mehrwert ist die VERBINDUNG: "Dein Profil + dieser Job = DIESES konkrete Problem das du noch nicht siehst."
-4. **Sprache:** Du-Form, einfach, Berufsschulniveau. Kein HR-Jargon. NUR Deutsch.
-   NIEMALS "als wie" schreiben — das ist grammatikalisch falsch. Immer "als" ODER "wie", nie zusammen.
-5. **Dimension-zu-Skill Mapping:** Erkläre WARUM ein bestimmter Dimension-Score für einen bestimmten Skill relevant ist.
-6. **Skill-Namen klar halten:** Keine Abkürzungen oder Fachbegriffe. "CRM" → "Kundenbeziehungen aufbauen". "KPI" → "Ziele setzen und nachverfolgen". Der User muss sofort verstehen was gemeint ist.
+   - 90%+ = Nur bei perfektem Match
 
-### MAPPING-LOGIK:
-Für jeden Skill überlege:
-- Welche Dimensionen sind für diesen Skill am wichtigsten?
-- Wie hoch müssten sie sein?
-- Wie hoch SIND sie beim User?
-- Was ist die Lücke?
+4. **Überraschende Verbindungen!** Der Mehrwert ist NICHT "du bist empathisch". Der Mehrwert ist: "Deine hohe Empathie + niedrige Durchsetzung = du wirst genau wissen dass dein Mitarbeiter Mist baut, aber nichts sagen. Das frisst dich auf."
 
-Beispiel:
-Skill "Teamführung" braucht: Durchsetzung HOCH + Empathie HOCH
-User hat: Durchsetzung NIEDRIG + Empathie HOCH
-→ "Du bist empathisch und spürst was dein Team braucht — aber dir fehlt die Bereitschaft unpopuläre Entscheidungen zu treffen."
+5. **Sprache:** Du-Form, einfach, Berufsschulniveau. Kein HR-Jargon. NUR Deutsch. NIEMALS "als wie" — immer "als" ODER "wie".
+
+6. **Bewertung pro Dimension:** Überlege für JEDE Dimension: Wie wichtig ist sie für "{zieljob}"? Wie hoch SOLLTE sie sein? Wie hoch IST sie? Die Lücke bestimmt den Score.
+
+### DIMENSIONS-BEWERTUNG:
+Für jede der 7 Dimensionen:
+- Bestimme einen Zielwert (0-100) für den Job "{zieljob}"
+- Vergleiche mit dem gemessenen Wert
+- Berechne: dimension_score = max(60, 100 - abs(gemessen - zielwert))
+- Der match_score ist der Durchschnitt aller dimension_scores
 
 ### OUTPUT FORMAT (JSON):
 
 {{
   "match_score": 72,
-  "match_label": "Du bist auf einem guten Weg",
+  "match_label": "Kurzer Satz der das Ergebnis zusammenfasst",
   "dimensions": [
     {{
-      "skill": "Skill-Name aus der Recherche",
-      "score": 75,
-      "bewertung": "Stark / Solide / Entwicklungsbedarf / Lücke",
-      "insight": "Spezifischer Insight der Score UND konkrete Antwort verbindet. 1-2 Sätze."
+      "dimension": "durchsetzung",
+      "label": "Durchsetzung",
+      "user_score": 35,
+      "job_relevanz": "hoch",
+      "bewertung": "Entwicklungsbedarf",
+      "insight": "Konkreter Insight im Job-Kontext. Was bedeutet dieser Score für DIESEN Job? 2-3 Sätze. Beziehe dich auf konkrete Antworten."
+    }},
+    {{
+      "dimension": "empathie",
+      "label": "Empathie",
+      "user_score": 70,
+      "job_relevanz": "hoch",
+      "bewertung": "Stark",
+      "insight": "..."
     }}
   ],
   "staerken": [
-    {{"skill": "...", "begruendung": "Überraschend formuliert, bezieht sich auf Scores"}}
+    {{
+      "dimension": "...",
+      "begruendung": "Überraschend formuliert — warum ist diese Dimension deine Superkraft für diesen Job?"
+    }}
   ],
   "hauptgap": {{
-    "skill": "...",
-    "hauptluecke": "Was genau fehlt und warum",
-    "gap_intensity": "low / medium / high"
+    "dimension": "...",
+    "label": "...",
+    "beschreibung": "Was genau wird dir schwerfallen und WARUM — konkretes Szenario",
+    "intensity": "low / medium / high"
   }},
   "bright_vs_dark": {{
-    "unterschied": true,
-    "beschreibung": "Welche Dimension zeigt einen überraschenden Kontrast?"
+    "beschreibung": "Welche zwei Dimensionen erzeugen einen überraschenden Kontrast? Was passiert wenn du unter Druck gerätst?"
   }},
   "motive": {{
-    "profil": "2-3 Wörter die den User beschreiben",
-    "job_fit": "Wie passt das Motivationsprofil zum Zieljob?"
+    "profil": "2-4 Wörter die den User-Typ beschreiben",
+    "job_fit": "Passt dieses Motiv-Profil zum {zieljob}? Warum/warum nicht?"
   }},
-  "main_potential": "1 Satz: Größtes Pfund des Users für diesen Job",
-  "main_risk": "1 Satz: Größtes Risiko des Users für diesen Job",
+  "main_potential": "1 Satz: Dein größtes Pfund für diesen Job",
+  "main_risk": "1 Satz: Dein größtes Risiko in diesem Job",
   "buchempfehlung": {{
-    "titel": "Echtes Buch das zum größten Hebel passt",
+    "titel": "Echtes deutsches oder übersetztes Buch das zum größten Hebel passt",
     "autor": "Echter Autor",
-    "begruendung": "Warum genau dieses Buch für genau diesen User",
-    "amazon_suchbegriff": "Suchbegriff für Amazon"
+    "begruendung": "Warum genau dieses Buch für genau diesen User — beziehe dich auf den Hebel",
+    "amazon_suchbegriff": "Suchbegriff für Amazon DE"
   }},
-  "naechster_schritt": "1 konkreter Tipp was der User JETZT tun kann"
+  "naechster_schritt": "1 konkreter, einfacher Tipp — kein generisches 'netzwerke mehr'"
 }}
 
-Antworte NUR mit JSON. Kein Fließtext."""
+Antworte NUR mit dem JSON-Objekt. Kein Fließtext, keine Erklärung."""
 
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
