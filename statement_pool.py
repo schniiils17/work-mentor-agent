@@ -419,25 +419,25 @@ def get_statement_pool():
     }
 
 
-def select_items_for_session(n_statements: int = 12, n_forced: int = 4) -> list[dict]:
-    """Wählt eine Auswahl von Items für eine Session.
+def select_items_for_session(n_statements: int = 14, n_forced: int = 7) -> list[dict]:
+    """Wählt 21 Items für eine Session (14 Statements + 7 Forced Choice).
     
-    Stellt sicher dass jede Dimension mindestens 2x abgedeckt ist.
-    Mischt Agree/Disagree und Forced Choice.
+    Garantiert: Mindestens 2 Statements pro Dimension = min. 3 Datenpunkte
+    pro Dimension (2 Statements + ~1 Forced Choice).
+    21 Items ≈ 8 Minuten.
     """
     import random
     
-    # Sicherstellen dass jede Dimension min. 2x vorkommt
     selected_statements = []
     dimension_counts = {d: 0 for d in DIMENSIONS}
     
-    # Erst: 1 Item pro Dimension garantieren
+    # Erst: 2 Items pro Dimension garantieren
     for dim in DIMENSIONS:
         dim_items = [s for s in STATEMENTS if s["dimension"] == dim]
         if dim_items:
-            item = random.choice(dim_items)
-            selected_statements.append(item)
-            dimension_counts[dim] += 1
+            chosen = random.sample(dim_items, min(2, len(dim_items)))
+            selected_statements.extend(chosen)
+            dimension_counts[dim] += len(chosen)
     
     # Dann: Rest auffüllen bis n_statements
     remaining = [s for s in STATEMENTS if s not in selected_statements]
@@ -447,12 +447,11 @@ def select_items_for_session(n_statements: int = 12, n_forced: int = 4) -> list[
         if len(selected_statements) >= n_statements:
             break
         dim = item["dimension"]
-        # Maximal 3 pro Dimension
         if dimension_counts[dim] < 3:
             selected_statements.append(item)
             dimension_counts[dim] += 1
     
-    # Forced Choices auswählen
+    # Forced Choices: alle 7 verwenden (jede deckt 2 Dimensionen ab)
     selected_forced = random.sample(FORCED_CHOICES, min(n_forced, len(FORCED_CHOICES)))
     
     # Mischen: Statements und Forced Choices durcheinander
@@ -462,15 +461,13 @@ def select_items_for_session(n_statements: int = 12, n_forced: int = 4) -> list[
     
     random.shuffle(selected_statements)
     
-    # Pattern: 2-3 Statements, dann 1 Forced Choice
+    # Pattern: 2 Statements, dann 1 Forced Choice
     while stmt_idx < len(selected_statements) or fc_idx < len(selected_forced):
-        # 2-3 Statements
-        batch = random.randint(2, 3)
+        batch = 2
         for _ in range(batch):
             if stmt_idx < len(selected_statements):
                 all_items.append(selected_statements[stmt_idx])
                 stmt_idx += 1
-        # 1 Forced Choice
         if fc_idx < len(selected_forced):
             all_items.append(selected_forced[fc_idx])
             fc_idx += 1
@@ -524,12 +521,21 @@ def score_answers(answers: list[dict]) -> dict:
         score = 1.0 if richtung == "hoch" else 0.0
         dimension_scores[dim].append(score)
     
-    # Durchschnitt pro Dimension
+    # Durchschnitt pro Dimension + Glättung
+    # Bei wenigen Items (2-4) würden Rohwerte zu extrem (0%, 50%, 100%).
+    # Bayesian Smoothing: Mische mit einem neutralen Prior (0.5).
+    # Je weniger Items, desto stärker zieht der Prior zur Mitte.
+    PRIOR_WEIGHT = 1.5  # Entspricht ~1.5 "neutrale" Antworten
+    
     result = {}
     for dim, scores in dimension_scores.items():
         if scores:
-            result[dim] = round(sum(scores) / len(scores), 2)
+            n = len(scores)
+            raw_mean = sum(scores) / n
+            # Bayesian Smoothing: (sum + prior * 0.5) / (n + prior)
+            smoothed = (sum(scores) + PRIOR_WEIGHT * 0.5) / (n + PRIOR_WEIGHT)
+            result[dim] = round(smoothed, 2)
         else:
-            result[dim] = 0.5  # Keine Daten = neutral
+            result[dim] = 0.5
     
     return result
