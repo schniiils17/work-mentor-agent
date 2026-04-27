@@ -13,9 +13,12 @@ from agent import start_session, process_answer, continue_after_magic, sessions
 from skill_research import research_skills, clarify_job, research_diagnostik_strategy
 from statement_pool import select_items_for_session, score_answers
 from evaluator import evaluate_assessment
+from anthropic import Anthropic
 
 # .env laden
 load_dotenv()
+
+client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 # App erstellen
 app = FastAPI(
@@ -67,6 +70,60 @@ async def api_job_clarify(req: JobClarifyRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/jobs/context")
+async def api_job_context(req: JobClarifyRequest):
+    """
+    Smarter Kontext-Check: Claude entscheidet ob eine Rückfrage nötig ist.
+    Wenn ja: generiert 1 Klick-Frage mit 2-3 passenden Optionen.
+    Wenn nein: gibt needs_clarification=false zurück.
+    """
+    try:
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=500,
+            messages=[{"role": "user", "content": f"""Ein User will einen Job-Readiness-Check machen für: "{req.zieljob}"
+
+Entscheide: Ist der Job EINDEUTIG genug um die Persönlichkeits-Auswertung zu kontextualisieren?
+
+Eindeutig = Wir wissen grob was der Alltag aussieht.
+- "Softwareentwickler" → eindeutig (schreibt Code, Löst Probleme)
+- "Lehrer" → eindeutig (unterrichtet, betreut Schüler)
+- "Krankenpfleger" → eindeutig
+
+Mehrdeutig = Gleicher Titel, aber völlig anderer Alltag möglich.
+- "Vertriebsleiter" → mehrdeutig (Führt Team ODER ist selbst draußen?)
+- "Berater" → mehrdeutig (Intern oder beim Kunden?)
+- "Projektmanager" → mehrdeutig (IT, Bau, Marketing?)
+
+Wenn MEHRDEUTIG: Generiere genau 1 Frage mit 2-3 Klick-Optionen.
+Die Frage soll den GRÖSSTEN Unterschied im Alltag klären.
+Optionen: Kurz, klar, mit Emoji. Alltagssprache.
+
+Antworte NUR mit JSON:
+{{
+  "needs_clarification": true/false,
+  "frage": "Wie sieht dein Alltag als [Job] eher aus?" (nur wenn needs_clarification=true),
+  "optionen": [
+    {{"id": "a", "text": "🏢 Kurze Beschreibung Option A"}},
+    {{"id": "b", "text": "🤝 Kurze Beschreibung Option B"}}
+  ] (nur wenn needs_clarification=true),
+  "kontext_wenn_klar": "1 Satz was der Job bedeutet" (nur wenn needs_clarification=false)
+}}"""}]
+        )
+        
+        import json
+        text = response.content[0].text.strip()
+        if text.startswith("```"):
+            text = text.split("```")[1]
+            if text.startswith("json"):
+                text = text[4:]
+            text = text.strip()
+        return json.loads(text)
+    except Exception as e:
+        # Bei Fehler: einfach keine Frage stellen
+        return {"needs_clarification": False, "kontext_wenn_klar": req.zieljob}
 
 
 @app.post("/api/skills/diagnostik")

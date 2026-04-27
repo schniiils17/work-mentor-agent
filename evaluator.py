@@ -55,13 +55,9 @@ async def evaluate_assessment(
             answer_details += f"\n- \"{text}\" → {antwort_text}"
     
     # Job-Fokus in lesbaren Text
-    fokus_map = {
-        "team": "Schwerpunkt: Team führen, Strategie, interne Meetings (NICHT viel direkter Kundenkontakt)",
-        "kunden": "Schwerpunkt: Selbst Kunden betreuen, Termine, Verhandlungen",
-        "mix": "Mix aus Team-Führung und direktem Kundenkontakt",
-    }
-    fokus_text = fokus_map.get(job_fokus, "")
-    fokus_section = f"\n\n## JOB-FOKUS DES USERS\n{fokus_text}\nBERUCKSICHTIGE DAS! Wenn der User sagt er führt ein Team, rede nicht von Kaltakquise oder Kundenterminen." if fokus_text else ""
+    fokus_section = ""
+    if job_fokus:
+        fokus_section = f"\n\n## JOB-FOKUS DES USERS\n{job_fokus}\nBERÜCKSICHTIGE DAS bei deinen Insights! Beziehe dich auf den tatsächlichen Alltag des Users, nicht auf Klischees des Jobtitels."
 
     prompt = f"""Du bist ein erfahrener Eignungsdiagnostiker.
 Ein User hat ein KURZES Persönlichkeits-Assessment (21 Fragen) absolviert für den Zieljob "{zieljob}".{fokus_section}
