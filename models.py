@@ -97,5 +97,6 @@ class EvaluateRequest(BaseModel):
     researched_skills: Optional[list[ResearchedSkill]] = None
     varianz_antworten: Optional[list[VarianzAntwort]] = None
     diagnostik_strategy: Optional[dict] = None
-    dimension_scores: dict  # {"durchsetzung": 0.7, "empathie": 0.4, ...}
-    answers: list[dict]  # [{"item_id": "D1", "antwort": "A"}, ...]
+    dimension_scores: dict = {}  # {"durchsetzung": 0.7, "empathie": 0.4, ...}
+    answers: list[dict] = []  # [{"item_id": "D1", "antwort": "A"}, ...]
+    job_fokus: str = ""  # "team" | "kunden" | "mix"

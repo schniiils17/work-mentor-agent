@@ -177,6 +177,7 @@ async def api_evaluate(req: EvaluateRequest):
             diagnostik_strategy=req.diagnostik_strategy,
             dimension_scores=verified_scores,
             answers=req.answers,
+            job_fokus=req.job_fokus,
         )
         
         return {
