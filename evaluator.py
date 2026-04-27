@@ -54,9 +54,9 @@ async def evaluate_assessment(
             answer_details += f"\n- \"{text}\" → {antwort_text}"
     
     prompt = f"""Du bist ein erfahrener Eignungsdiagnostiker.
-Ein User hat ein Persönlichkeits-Assessment absolviert für den Zieljob "{zieljob}".
+Ein User hat ein KURZES Persönlichkeits-Assessment (21 Fragen) absolviert für den Zieljob "{zieljob}".
 
-## GEMESSENE DIMENSIONEN (das sind die einzigen Daten die du hast!)
+## GEMESSENE DIMENSIONEN
 {scores_text}
 
 ## Einzelne Antworten
@@ -64,43 +64,52 @@ Ein User hat ein Persönlichkeits-Assessment absolviert für den Zieljob "{zielj
 
 ## DEINE AUFGABE
 
-Erstelle ein Ergebnis das die 7 GEMESSENEN Persönlichkeitsdimensionen im Kontext des Zieljobs "{zieljob}" interpretiert.
+Erstelle ein Ergebnis das die 7 Dimensionen als TENDENZEN im Kontext des Zieljobs "{zieljob}" zeigt.
 
-### WICHTIGE REGELN:
+### TONALITÄT — DAS WICHTIGSTE:
 
-1. **NUR die 7 Dimensionen zeigen!** Du hast NUR Persönlichkeitsdaten. Erfinde KEINE Job-Skills wie "Key Account Management" oder "Budgetplanung". Du weißt nicht ob der User das kann — du weißt nur wie er TICKT.
+1. **TENDENZEN, keine Diagnosen.** Du hast 21 Fragen — das reicht für Richtungen, nicht für Urteile.
+   - ✅ "Du neigst dazu, erstmal zuzuhören bevor du dich einbringst"
+   - ✅ "Struktur und Planung scheinen dir zu liegen"
+   - ✅ "Du bist tendenziell eher der Typ, der..."
+   - ❌ "Du vergisst keine Termine" (zu absolut)
+   - ❌ "Kaltakquise wird dir nicht liegen" (Urteil über Fähigkeit die wir nicht getestet haben)
+   - ❌ "Du wirst das schwierige Gespräch zu lange aufschieben" (Vorhersage als Fakt)
 
-2. **Jede Dimension durch die Job-Linse erklären.** Nicht "Deine Durchsetzung ist niedrig" (langweilig) sondern "Deine Durchsetzung ist niedrig — als {zieljob} heißt das: du wirst Meetings moderieren können, aber wenn einer nicht liefert wird dir das Kritikgespräch schwerfallen."
+2. **Respektvoll, nie belehrend.** Der User soll sich verstanden fühlen, nicht bewertet.
+   - ✅ "Konfrontation kostet dich tendenziell mehr Energie — das ist weder gut noch schlecht"
+   - ❌ "Du wirst zu lange höflich bleiben" (wertend)
+   - ❌ "Das wird ein Problem" (bedrohlich)
+   Statt "wird" → "könnte", "kann", "tendenziell".
 
-3. **Ehrlich aber motivierend.** Minimum Match-Score: 60%.
-   - 60-69% = "Solide Basis mit Entwicklungsfeldern"
-   - 70-79% = "Gut vorbereitet für diesen Schritt"  
-   - 80-89% = "Sehr stark aufgestellt"
+3. **Keine Job-Vorhersagen die über die Dimension hinausgehen.**
+   - ✅ "Durchsetzung ist bei Führungsrollen wichtig — hier gibt es Potenzial nach oben"
+   - ❌ "Budgetverhandlungen werden zäh" (wissen wir nicht)
+   - ❌ "Kaltakquise wird dir nicht liegen" (leitet zu viel ab)
+   Bleib bei dem was die Dimension aussagt. Keine konkreten Job-Szenarien erfinden.
+
+4. **Kurze Insights.** 1-2 Sätze pro Dimension. Nicht 3-4. Dicht und konkret.
+
+5. **NUR die 7 Dimensionen.** Keine Job-Skills erfinden.
+
+6. **Sprache:** Du-Form, einfach, Berufsschulniveau. NUR Deutsch.
+   - NIEMALS "als wie" — nur "als" ODER "wie".
+
+7. **Keine Halluzinationen.** Erfinde NICHTS über den User. Kein "dein Schreibtisch", kein "du liest gerne". Nur was aus den Antworten folgt.
+
+8. **Bewertungs-Labels:** NUR diese 4: "Sehr stark", "Stark", "Ausgeglichen", "Entwicklungsbedarf".
+
+9. **Match-Score:** Minimum 60%.
+   - 60-69% = Solide Basis
+   - 70-79% = Gut vorbereitet
+   - 80-89% = Sehr stark aufgestellt
    - 90%+ = Nur bei perfektem Match
-
-4. **Überraschende Verbindungen!** Der Mehrwert ist NICHT "du bist empathisch". Der Mehrwert ist: "Deine hohe Empathie + niedrige Durchsetzung = du wirst genau wissen dass dein Mitarbeiter Mist baut, aber nichts sagen. Das frisst dich auf."
-
-5. **Sprache:** Du-Form, einfach, Berufsschulniveau. Kein HR-Jargon. NUR Deutsch.
-   - NIEMALS "als wie" — immer NUR "als" ODER NUR "wie". Beispiel: "besser als andere" ✓, "besser wie andere" ✓ (umgangssprache), "besser als wie andere" ✗ VERBOTEN.
-   - Schreibe "dass" mit Doppel-s.
-
-6. **KEINE HALLUZINATIONEN!** Beziehe dich NUR auf die konkreten Antworten oben. Erfinde KEINE Details über den User (z.B. "dein Schreibtisch ist aufgeräumt", "du liest gerne"). Du weißt NICHTS über den User außer seinen Antworten. Wenn du ein Szenario beschreibst, mache klar dass es eine VORHERSAGE ist ("du wirst wahrscheinlich..."), nicht eine Beobachtung.
-
-6. **Bewertung pro Dimension:** Überlege für JEDE Dimension: Wie wichtig ist sie für "{zieljob}"? Wie hoch SOLLTE sie sein? Wie hoch IST sie? Die Lücke bestimmt den Score.
-8. **Bewertungs-Labels:** Verwende NUR diese 4 Labels: "Sehr stark", "Stark", "Ausgeglichen", "Entwicklungsbedarf". NICHT "Ausreichend" (klingt wie Schulnote 4), NICHT "Gut", NICHT "Lücke".
-
-### DIMENSIONS-BEWERTUNG:
-Für jede der 7 Dimensionen:
-- Bestimme einen Zielwert (0-100) für den Job "{zieljob}"
-- Vergleiche mit dem gemessenen Wert
-- Berechne: dimension_score = max(60, 100 - abs(gemessen - zielwert))
-- Der match_score ist der Durchschnitt aller dimension_scores
 
 ### OUTPUT FORMAT (JSON):
 
 {{
   "match_score": 72,
-  "match_label": "Kurzer Satz der das Ergebnis zusammenfasst",
+  "match_label": "Kurzer ermutigender Satz — keine Kritik im Header",
   "dimensions": [
     {{
       "dimension": "durchsetzung",
@@ -108,45 +117,37 @@ Für jede der 7 Dimensionen:
       "user_score": 35,
       "job_relevanz": "hoch",
       "bewertung": "Entwicklungsbedarf",
-      "insight": "Konkreter Insight im Job-Kontext. Was bedeutet dieser Score für DIESEN Job? 2-3 Sätze. Beziehe dich auf konkrete Antworten."
-    }},
-    {{
-      "dimension": "empathie",
-      "label": "Empathie",
-      "user_score": 70,
-      "job_relevanz": "hoch",
-      "bewertung": "Stark",
-      "insight": "..."
+      "insight": "1-2 Sätze als TENDENZ formuliert. Was bedeutet diese Richtung für den Job?"
     }}
   ],
   "staerken": [
     {{
       "dimension": "...",
-      "begruendung": "Überraschend formuliert — warum ist diese Dimension deine Superkraft für diesen Job?"
+      "begruendung": "Warum ist diese Tendenz ein Vorteil für den Job? Kurz und überraschend."
     }}
   ],
   "hauptgap": {{
     "dimension": "...",
     "label": "...",
-    "beschreibung": "Was genau wird dir schwerfallen und WARUM — konkretes Szenario",
+    "beschreibung": "Was KÖNNTE herausfordernd werden — als Möglichkeit formuliert, nicht als Urteil",
     "intensity": "low / medium / high"
   }},
   "bright_vs_dark": {{
-    "beschreibung": "Welche zwei Dimensionen erzeugen einen überraschenden Kontrast? Was passiert wenn du unter Druck gerätst?"
+    "beschreibung": "Welche zwei Dimensionen erzeugen einen interessanten Kontrast? Was KÖNNTE unter Druck passieren?"
   }},
   "motive": {{
-    "profil": "2-4 Wörter die den User-Typ beschreiben",
-    "job_fit": "Passt dieses Motiv-Profil zum {zieljob}? Warum/warum nicht?"
+    "profil": "2-4 Wörter Typ-Beschreibung",
+    "job_fit": "Kurzer Satz ob der Typ zum Job passt"
   }},
-  "main_potential": "1 Satz: Dein größtes Pfund für diesen Job",
-  "main_risk": "1 Satz: Dein größtes Risiko in diesem Job",
+  "main_potential": "1 Satz: Dein größtes Pfund",
+  "main_risk": "1 Satz: Worauf du achten solltest — als freundlicher Hinweis",
   "buchempfehlung": {{
-    "titel": "Echtes deutsches oder übersetztes Buch das zum größten Hebel passt",
+    "titel": "Echtes deutsches/übersetztes Buch",
     "autor": "Echter Autor",
-    "begruendung": "Warum genau dieses Buch für genau diesen User — beziehe dich auf den Hebel",
+    "begruendung": "Warum dieses Buch für diesen User — kurz",
     "amazon_suchbegriff": "Suchbegriff für Amazon DE"
   }},
-  "naechster_schritt": "1 konkreter, einfacher Tipp — kein generisches 'netzwerke mehr'"
+  "naechster_schritt": "1 konkreter einfacher Tipp"
 }}
 
 Antworte NUR mit dem JSON-Objekt. Kein Fließtext, keine Erklärung."""
