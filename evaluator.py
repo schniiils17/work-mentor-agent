@@ -59,8 +59,21 @@ async def evaluate_assessment(
     if job_fokus:
         fokus_section = f"\n\n## JOB-FOKUS DES USERS\n{job_fokus}\nBERÜCKSICHTIGE DAS bei deinen Insights! Beziehe dich auf den tatsächlichen Alltag des Users, nicht auf Klischees des Jobtitels."
 
+    # Recherchierte Skills als Kontext
+    skills_context = ""
+    if researched_skills:
+        skills_context = "\n\n## RECHERCHIERTE JOB-SKILLS (aus echten Stellenanzeigen)\n"
+        for i, skill in enumerate(researched_skills[:7], 1):
+            name = skill.get('name', '?')
+            beschr = skill.get('beschreibung', '')
+            gew = skill.get('gewichtung', 0)
+            skills_context += f"\n{i}. **{name}** (Gewichtung: {gew:.1f})"
+            if beschr:
+                skills_context += f"\n   {beschr}"
+        skills_context += "\n\nBewerte für JEDEN dieser Skills: Wie gut passt das Persönlichkeitsprofil des Users dazu? Gib das im skill_fits Array zurück.\n"
+
     prompt = f"""Du bist ein erfahrener Eignungsdiagnostiker.
-Ein User hat ein KURZES Persönlichkeits-Assessment (21 Fragen) absolviert für den Zieljob "{zieljob}".{fokus_section}
+Ein User hat ein KURZES Persönlichkeits-Assessment (21 Fragen) absolviert für den Zieljob "{zieljob}".{fokus_section}{skills_context}
 
 ## GEMESSENE DIMENSIONEN
 {scores_text}
@@ -116,10 +129,18 @@ Erstelle ein Ergebnis das die 7 Dimensionen als TENDENZEN im Kontext des Zieljob
 {{
   "match_score": 72,
   "match_label": "Kurzer ermutigender Satz — keine Kritik im Header",
+  "skill_fits": [
+    {{
+      "skill": "Menschen führen und motivieren",
+      "beschreibung": "Du sorgst dafür dass dein Team weiß was zu tun ist und motiviert bleibt.",
+      "fit": "passt_gut / solide_basis / dein_hebel",
+      "fit_grund": "1 Satz warum dieser Fit. Bezug auf Dimension-Scores."
+    }}
+  ],
   "dimensions": [
     {{
       "dimension": "durchsetzung",
-      "label": "Durchsetzung",
+      "label": "Bestimmtheit",
       "user_score": 35,
       "job_relevanz": "hoch",
       "bewertung": "Entwicklungsbedarf",
@@ -155,6 +176,15 @@ Erstelle ein Ergebnis das die 7 Dimensionen als TENDENZEN im Kontext des Zieljob
   }},
   "naechster_schritt": "1 konkreter einfacher Tipp"
 }}
+
+### SKILL-FIT REGELN:
+- Nimm die recherchierten Skills und bewerte für JEDEN: Wie gut passt das Persönlichkeitsprofil des Users?
+- "passt_gut" = Die relevanten Dimensionen des Users passen stark zum Skill
+- "solide_basis" = Grundlage da, aber kein Highlight
+- "dein_hebel" = Hier ist die größte Lücke — als Chance formuliert!
+- Bei einem Match-Score von 68% kann NICHT alles "passt_gut" sein! Verteile realistisch.
+- Nutze die Dimension-Scores um den Fit zu begründen. Z.B. hohe Empathie + Skill "Menschen führen" = passt_gut.
+- Die Beschreibung muss EINFACH sein (Berufsschulniveau, Du-Form, 1 Satz).
 
 Antworte NUR mit dem JSON-Objekt. Kein Fließtext, keine Erklärung."""
 

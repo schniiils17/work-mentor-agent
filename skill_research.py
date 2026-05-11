@@ -274,13 +274,32 @@ Position: "{zieljob}" in "{branche}". User ist aktuell "{aktueller_job}".
 
 ## Deine Aufgabe
 
-### 1. Skills extrahieren (8-10 Skills)
+### 1. Skills extrahieren (5-7 Skills)
 
-Analysiere ALLE Stellenanzeigen und extrahiere die Skills die TATSÄCHLICH gefordert werden.
-- Sortiere nach Häufigkeit: Was kommt in den MEISTEN Anzeigen vor?
-- Unterscheide Hard Skills und Soft Skills
-- Gewichtung = Wie oft der Skill vorkommt (0.0-1.0)
+Analysiere ALLE Stellenanzeigen und extrahiere was dieser Job WIRKLICH von einem Menschen verlangt.
+
+WICHTIG — ÜBERSETZE Stellenanzeigen-Buzzwords in MENSCHLICHE FÄHIGKEITEN:
+- NICHT "CRM-Systeme (Salesforce, HubSpot)" → DAS ist ein Tool, kein Skill
+- NICHT "Budgetverantwortung und Controlling" → DAS ist eine Aufgabe, kein Skill
+- NICHT "Strategische Vertriebsplanung" → DAS ist HR-Sprache
+
+STATTDESSEN die menschlichen Fähigkeiten DAHINTER:
+- "Menschen führen und motivieren" (statt "Teamleitung")
+- "Unter Druck Entscheidungen treffen" (statt "Entscheidungskompetenz")
+- "Kunden überzeugen ohne zu überreden" (statt "Vertriebskompetenz")
+- "Konflikte ansprechen statt aussitzen" (statt "Konfliktmanagement")
+- "Ziele setzen und dranbleiben" (statt "Zielorientierung")
+- "Strukturiert arbeiten wenn es chaotisch wird" (statt "Organisationsfähigkeit")
+
+Der TEST: Würde ein normaler Mensch (kein HR-Manager) sagen "Ja, DAS macht einen guten [Zieljob] aus"? Wenn nein → umformulieren.
+
+Weitere Regeln:
+- NUR Skills die mit PERSÖNLICHKEIT zu tun haben (wir testen Persönlichkeit, keine Fachkenntnisse)
+- Pro Skill: 1 Satz Beschreibung in einfacher Sprache (Berufsschulniveau, Du-Form)
+- Sortiere nach Wichtigkeit: Was macht den UNTERSCHIED zwischen gut und schlecht in diesem Job?
+- Gewichtung = Wie wichtig für den Erfolg (0.0-1.0)
 - Varianz = Wie UNTERSCHIEDLICH die Anforderungen sind
+- Maximal 5-7 Skills. Qualität vor Quantität.
 
 ### 2. Kalibrierungs-Fragen (4-7 Fragen — EXTREM WICHTIG!)
 
@@ -332,9 +351,15 @@ Position: "{zieljob}" in "{branche}". User ist aktuell "{aktueller_job}".
 
 Nutze dein Wissen über ECHTE Stellenanzeigen für diese Position.
 
-### 1. Skills (8-10)
-Was fordern echte Stellenanzeigen für "{zieljob}" in "{branche}"?
-Denke an konkrete Jobbörsen-Anzeigen die du kennst.
+### 1. Skills (5-7)
+Was macht einen GUTEN "{zieljob}" in "{branche}" aus? Denke an die MENSCHLICHEN FÄHIGKEITEN, nicht an Tools oder Aufgaben.
+
+WICHTIG: Übersetze Stellenanzeigen-Sprache in normale Sprache:
+- NICHT "CRM-Systeme" oder "Budgetverantwortung" (das sind Tools/Aufgaben)
+- SONDERN "Menschen führen und motivieren", "Unter Druck Entscheidungen treffen", "Konflikte ansprechen statt aussitzen"
+- NUR Skills die mit PERSÖNLICHKEIT zu tun haben (wir testen Persönlichkeit, keine Fachkenntnisse)
+- Pro Skill: 1 Satz Beschreibung in einfacher Sprache (Du-Form)
+- Maximal 5-7 Skills. Qualität vor Quantität.
 
 ### 2. Kalibrierungs-Fragen (4-7 Fragen)
 
@@ -460,8 +485,9 @@ def get_json_template():
     return """{
   "skills": [
     {
-      "name": "Skill-Name",
-      "kategorie": "hard_skill oder soft_skill",
+      "name": "Menschlich formulierter Skill-Name (z.B. 'Menschen führen und motivieren', NICHT 'CRM-Systeme' oder 'Budgetverantwortung')",
+      "beschreibung": "1 Satz der erklärt was das im Alltag bedeutet. Einfache Sprache. Z.B. 'Du sorgst dafür dass dein Team an einem Strang zieht und jeder weiß was zu tun ist.'",
+      "kategorie": "soft_skill oder hard_skill",
       "gewichtung": 0.9,
       "belege": ["Aus Anzeige X: Zitat", "In Y von Z Anzeigen gefordert"],
       "varianz": "hoch oder mittel oder niedrig",
