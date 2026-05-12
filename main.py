@@ -10,7 +10,23 @@ from dotenv import load_dotenv
 
 from models import StartRequest, AnswerRequest, ContinueRequest, SkillResearchRequest, JobClarifyRequest, DiagnostikStrategyRequest, ItemsRequest, EvaluateRequest, WaitlistRequest, TrackEventRequest
 import json
+import httpx
 from datetime import datetime, timezone
+
+# Telegram Alert Bot
+TG_BOT_TOKEN = os.getenv("TG_ALERT_BOT_TOKEN", "8549776298:AAHj2nC4mMqiACWWy8lhr3zYZ_9K9H2SOoo")
+TG_ALERT_CHAT_ID = os.getenv("TG_ALERT_CHAT_ID", "8084134538")
+
+async def _tg_alert(text: str):
+    """Schickt eine Benachrichtigung an den Work Mentor Alerts Bot."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as http:
+            await http.post(
+                f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage",
+                json={"chat_id": TG_ALERT_CHAT_ID, "text": text, "parse_mode": "HTML"}
+            )
+    except Exception:
+        pass  # Fire and forget — Alert-Fehler dürfen den User-Flow nie blockieren
 from agent import start_session, process_answer, continue_after_magic, sessions
 from skill_research import research_skills, clarify_job, research_diagnostik_strategy
 from statement_pool import select_items_for_session, score_answers
@@ -371,6 +387,10 @@ async def api_waitlist(req: WaitlistRequest):
         "timestamp": datetime.now(timezone.utc).isoformat(),
     })
     
+    # Telegram-Alert
+    now = datetime.now(timezone.utc).strftime("%H:%M")
+    await _tg_alert(f"📩 <b>Neue Wartelisten-Anmeldung!</b>\n\nE-Mail: {req.email}\nZieljob: {req.zieljob}\nZeit: {now} UTC")
+    
     return {"ok": True, "message": "Erfolgreich eingetragen"}
 
 
@@ -385,6 +405,21 @@ async def api_track(req: TrackEventRequest):
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
     _append_json(EVENTS_FILE, entry)
+    
+    # Telegram-Alerts für wichtige Events
+    now = datetime.now(timezone.utc).strftime("%H:%M")
+    if req.event == "assessment_started":
+        await _tg_alert(f"🟢 <b>Assessment gestartet</b>\n\nZieljob: {req.zieljob}\nZeit: {now} UTC")
+    elif req.event == "assessment_completed":
+        score = req.data.get("match_score", "?")
+        await _tg_alert(f"✅ <b>Assessment abgeschlossen!</b>\n\nZieljob: {req.zieljob}\nMatch-Score: {score}%\nZeit: {now} UTC")
+    elif req.event == "share_clicked":
+        platform = req.data.get("platform", "?")
+        await _tg_alert(f"📤 <b>Ergebnis geteilt</b>\n\nPlattform: {platform}\nZieljob: {req.zieljob}")
+    elif req.event == "amazon_clicked":
+        buch = req.data.get("buch", "?")
+        await _tg_alert(f"📚 <b>Amazon-Link geklickt</b>\n\nBuch: {buch}\nZieljob: {req.zieljob}")
+    
     return {"ok": True}
 
 
@@ -397,6 +432,53 @@ async def api_waitlist_list():
         return {"count": len(data), "entries": data}
     except (FileNotFoundError, json.JSONDecodeError):
         return {"count": 0, "entries": []}
+
+
+@app.get("/api/stats")
+async def api_stats():
+    """Dashboard: Zusammenfassung aller Events."""
+    try:
+        with open(EVENTS_FILE, "r") as f:
+            events = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        events = []
+    
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    def count(event_name, date_filter=None):
+        return len([e for e in events if e["event"] == event_name and (not date_filter or e.get("timestamp", "").startswith(date_filter))])
+    
+    # Beliebteste Zieljobs
+    jobs = {}
+    for e in events:
+        if e["event"] == "assessment_started" and e.get("zieljob"):
+            jobs[e["zieljob"]] = jobs.get(e["zieljob"], 0) + 1
+    top_jobs = sorted(jobs.items(), key=lambda x: x[1], reverse=True)[:10]
+    
+    gesamt_started = count("assessment_started")
+    gesamt_completed = count("assessment_completed")
+    
+    return {
+        "heute": {
+            "gestartet": count("assessment_started", today),
+            "abgeschlossen": count("assessment_completed", today),
+            "warteliste": count("waitlist_signup", today),
+            "amazon_clicks": count("amazon_clicked", today),
+            "shares": count("share_clicked", today),
+        },
+        "gesamt": {
+            "gestartet": gesamt_started,
+            "abgeschlossen": gesamt_completed,
+            "warteliste": count("waitlist_signup"),
+            "amazon_clicks": count("amazon_clicked"),
+            "shares": count("share_clicked"),
+            "beliebteste_jobs": [j[0] for j in top_jobs],
+        },
+        "conversion": {
+            "start_to_finish": f"{round(gesamt_completed / gesamt_started * 100)}%" if gesamt_started > 0 else "n/a",
+            "finish_to_waitlist": f"{round(count('waitlist_signup') / gesamt_completed * 100)}%" if gesamt_completed > 0 else "n/a",
+        }
+    }
 
 
 @app.get("/api/events")
