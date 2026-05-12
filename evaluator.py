@@ -76,7 +76,8 @@ Der Job-Fokus SCHLÄGT alles andere. Ignoriere Klischees des Jobtitels."""
             skills_context += f"\n{i}. **{name}** (Gewichtung: {gew:.1f})"
             if beschr:
                 skills_context += f"\n   {beschr}"
-        skills_context += "\n\nBewerte für JEDEN dieser Skills: Wie gut passt das Persönlichkeitsprofil des Users dazu? Gib das im skill_fits Array zurück.\n"
+        skills_context += "\n\nBewerte für JEDEN dieser Skills: Wie gut passt das Persönlichkeitsprofil des Users dazu? Gib das im skill_fits Array zurück."
+        skills_context += "\n\nWICHTIG: Wenn ein Skill NICHT zum Job-Fokus des Users passt (z.B. 'Kunden überzeugen' obwohl der User 'strategisch, nicht am Kunden' gesagt hat), dann LASS DIESEN SKILL WEG aus skill_fits. Gib nur Skills zurück die zum tatsächlichen Fokus passen. Lieber 3-4 passende Skills als 5-6 wo manche Quatsch sind.\n"
 
     prompt = f"""Du bist ein erfahrener Eignungsdiagnostiker.
 Ein User hat ein KURZES Persönlichkeits-Assessment (21 Fragen) absolviert für den Zieljob "{zieljob}".{fokus_section}{skills_context}
