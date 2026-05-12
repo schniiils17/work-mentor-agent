@@ -195,15 +195,27 @@ Erstelle ein Ergebnis das die 7 Dimensionen als TENDENZEN im Kontext des Zieljob
 - WICHTIG: Pro Skill gibt es NUR EINEN SATZ — den fit_grund. Keine separate Beschreibung, kein Doppeltext.
   Der fit_grund ist kurz, übergeordnet, locker formuliert. Kein pseudo-analytisches Zerlegen von Antworten.
   MAXIMAL 12-15 Wörter pro fit_grund!
-  Beispiele:
-    fit_grund (passt_gut): "Genau dein Ding — da bringst du viel mit."
-    fit_grund (passt_gut): "Liegt dir — das merkt man an deinen Antworten."
-    fit_grund (solide_basis): "Gute Grundlage — mit etwas mehr Klarheit wird das rund."
-    fit_grund (solide_basis): "Ist da, aber noch ausbaufähig."
-    fit_grund (dein_hebel): "Hier liegt dein größstes Potenzial."
-    fit_grund (dein_hebel): "Da geht noch was — genau hier lohnt es sich reinzulegen."
-  NICHT: "Du hörst erstmal zu bevor du dich einbringst" (zu spezifisch, anmaßend)
-  NICHT: "Deine Mischung aus Empathie und Struktur..." (zu analytisch für Gratis)
+  
+  SPRACH-REGEL: Schreibe wie ein kluger Freund der dich kennt. NICHT wie ein Psychologe.
+  VERMEIDE die Dimensions-Namen (NICHT "Empathie", "Durchsetzung", "Stressresistenz", "Extraversion" etc.)
+  Stattdessen NORMALE Worte:
+  - Statt "Empathie ist da" → "Du spürst schnell was andere brauchen"
+  - Statt "hohe Stressresistenz" → "Druck macht dich eher wach als nervös"
+  - Statt "Durchsetzung noch ausbaufähig" → "Könntest öfter sagen was du willst"
+  - Statt "Ist da, aber noch ausbaufähig" → "Grundlage steht, da geht aber noch was"
+  
+  Gute Beispiele:
+    passt_gut: "Das liegt dir — merkt man."
+    passt_gut: "Druck macht dich eher wach als nervös."
+    passt_gut: "Da fühlst du dich wohl, das sieht man."
+    solide_basis: "Grundlage steht — da geht aber noch was."
+    solide_basis: "Kannst du, aber es kostet dich noch Energie."
+    dein_hebel: "Genau hier lohnt es sich reinzulegen."
+    dein_hebel: "Das fällt dir nicht leicht — und genau da liegt der Hebel."
+  
+  NICHT: "Empathie ist da, aber Durchsetzung noch ausbaufähig" (Dimensions-Namen = KI-Sprache)
+  NICHT: "Hohe Stressresistenz bringst du mit" (klingt wie Zeugnis)
+  NICHT: "Deine Mischung aus X und Y" (zu analytisch)
 
 Antworte NUR mit dem JSON-Objekt. Kein Fließtext, keine Erklärung."""
 
