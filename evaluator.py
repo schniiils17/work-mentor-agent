@@ -57,7 +57,13 @@ async def evaluate_assessment(
     # Job-Fokus in lesbaren Text
     fokus_section = ""
     if job_fokus:
-        fokus_section = f"\n\n## JOB-FOKUS DES USERS\n{job_fokus}\nBERÜCKSICHTIGE DAS bei deinen Insights! Beziehe dich auf den tatsächlichen Alltag des Users, nicht auf Klischees des Jobtitels."
+        fokus_section = f"""\n\n## JOB-FOKUS DES USERS (EXTREM WICHTIG!)
+Der User hat auf Rückfrage klarifiziert wie sein Zieljob aussieht:
+\"{job_fokus}\"\n
+DAS ist die Realität dieses Users. ALLE Insights, Skill-Fits und Beschreibungen MÜSSEN sich darauf beziehen.
+Wenn der User gesagt hat \"strategisch, nicht am Kunden\", dann KEINE Insights über Kundengespräche, Kaltakquise oder spontane Kundensituationen.
+Wenn der User gesagt hat \"kleines Team\", dann KEINE Insights über Großteam-Führung.
+Der Job-Fokus SCHLÄGT alles andere. Ignoriere Klischees des Jobtitels."""
 
     # Recherchierte Skills als Kontext
     skills_context = ""
