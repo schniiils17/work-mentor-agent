@@ -88,6 +88,18 @@ class ItemsRequest(BaseModel):
     session_id: str
 
 
+class WaitlistRequest(BaseModel):
+    email: str
+    zieljob: str = ""
+
+
+class TrackEventRequest(BaseModel):
+    event: str  # z.B. "assessment_started", "assessment_completed", "waitlist_signup", "share_clicked", "amazon_clicked"
+    session_id: str = ""
+    zieljob: str = ""
+    data: dict = {}  # Extra-Daten je nach Event
+
+
 class EvaluateRequest(BaseModel):
     session_id: str
     zieljob: str

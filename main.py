@@ -8,7 +8,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from models import StartRequest, AnswerRequest, ContinueRequest, SkillResearchRequest, JobClarifyRequest, DiagnostikStrategyRequest, ItemsRequest, EvaluateRequest
+from models import StartRequest, AnswerRequest, ContinueRequest, SkillResearchRequest, JobClarifyRequest, DiagnostikStrategyRequest, ItemsRequest, EvaluateRequest, WaitlistRequest, TrackEventRequest
+import json
+from datetime import datetime, timezone
 from agent import start_session, process_answer, continue_after_magic, sessions
 from skill_research import research_skills, clarify_job, research_diagnostik_strategy
 from statement_pool import select_items_for_session, score_answers
@@ -329,6 +331,83 @@ async def get_session(session_id: str):
         "fragen_gestellt": session.fragen_gestellt,
         "abgeschlossen": session.abgeschlossen
     }
+
+
+# ─── Waitlist ───────────────────────────────────────────────────
+
+WAITLIST_FILE = "/tmp/waitlist.json"
+EVENTS_FILE = "/tmp/events.json"
+
+def _append_json(filepath: str, entry: dict):
+    """Appends a JSON entry to a file (one JSON array)."""
+    try:
+        with open(filepath, "r") as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        data = []
+    data.append(entry)
+    with open(filepath, "w") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+@app.post("/api/waitlist")
+async def api_waitlist(req: WaitlistRequest):
+    """Speichert eine E-Mail auf der Warteliste."""
+    if not req.email or "@" not in req.email:
+        raise HTTPException(status_code=400, detail="Ungültige E-Mail")
+    
+    entry = {
+        "email": req.email,
+        "zieljob": req.zieljob,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    _append_json(WAITLIST_FILE, entry)
+    
+    # Event tracken
+    _append_json(EVENTS_FILE, {
+        "event": "waitlist_signup",
+        "email": req.email,
+        "zieljob": req.zieljob,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+    
+    return {"ok": True, "message": "Erfolgreich eingetragen"}
+
+
+@app.post("/api/track")
+async def api_track(req: TrackEventRequest):
+    """Trackt ein Frontend-Event (Assessment gestartet, abgebrochen, geteilt etc.)"""
+    entry = {
+        "event": req.event,
+        "session_id": req.session_id,
+        "zieljob": req.zieljob,
+        "data": req.data,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    _append_json(EVENTS_FILE, entry)
+    return {"ok": True}
+
+
+@app.get("/api/waitlist")
+async def api_waitlist_list():
+    """Gibt alle Wartelisten-Einträge zurück (für dich zum Checken)."""
+    try:
+        with open(WAITLIST_FILE, "r") as f:
+            data = json.load(f)
+        return {"count": len(data), "entries": data}
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"count": 0, "entries": []}
+
+
+@app.get("/api/events")
+async def api_events_list():
+    """Gibt alle getrackten Events zurück (für Analytics)."""
+    try:
+        with open(EVENTS_FILE, "r") as f:
+            data = json.load(f)
+        return {"count": len(data), "events": data}
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"count": 0, "events": []}
 
 
 if __name__ == "__main__":
