@@ -192,14 +192,18 @@ Erstelle ein Ergebnis das die 7 Dimensionen als TENDENZEN im Kontext des Zieljob
 - Bei einem Match-Score von 68% kann NICHT alles "passt_gut" sein! Verteile realistisch.
 - Nutze die Dimension-Scores um den Fit zu begründen. Z.B. hohe Empathie + Skill "Menschen führen" = passt_gut.
 - Die Beschreibung muss EINFACH sein (Berufsschulniveau, Du-Form, 1 Satz).
-- WICHTIG ZUR SPRACHE: Die Beschreibung erklärt was der Skill BEDEUTET (1 Satz). Der fit_grund macht den BEZUG ZUM USER — das ist der Magic-Moment!
-  Die Beschreibung ist sachlich, der fit_grund ist persönlich.
-  Beispiel:
-    beschreibung: "Ein Team so führen dass alle am Ball bleiben"
-    fit_grund (passt_gut): "Deine Empathie und Struktur sind genau die Kombi die hier zählt."
-    fit_grund (solide_basis): "Die Grundlage ist da — mit etwas mehr Klarheit in Drucksituationen wird das rund."
-    fit_grund (dein_hebel): "Hier liegt dein größtes Wachstumspotenzial — deine Antworten zeigen dass du Konflikte eher meidest."
-  Der fit_grund MUSS sich auf die ANTWORTEN des Users beziehen. Nicht generisch. Der User soll denken: 'Woher wissen die das?!'
+- WICHTIG: Pro Skill gibt es NUR EINEN SATZ — den fit_grund. Keine separate Beschreibung, kein Doppeltext.
+  Der fit_grund ist kurz, übergeordnet, locker formuliert. Kein pseudo-analytisches Zerlegen von Antworten.
+  MAXIMAL 12-15 Wörter pro fit_grund!
+  Beispiele:
+    fit_grund (passt_gut): "Genau dein Ding — da bringst du viel mit."
+    fit_grund (passt_gut): "Liegt dir — das merkt man an deinen Antworten."
+    fit_grund (solide_basis): "Gute Grundlage — mit etwas mehr Klarheit wird das rund."
+    fit_grund (solide_basis): "Ist da, aber noch ausbaufähig."
+    fit_grund (dein_hebel): "Hier liegt dein größstes Potenzial."
+    fit_grund (dein_hebel): "Da geht noch was — genau hier lohnt es sich reinzulegen."
+  NICHT: "Du hörst erstmal zu bevor du dich einbringst" (zu spezifisch, anmaßend)
+  NICHT: "Deine Mischung aus Empathie und Struktur..." (zu analytisch für Gratis)
 
 Antworte NUR mit dem JSON-Objekt. Kein Fließtext, keine Erklärung."""
 
