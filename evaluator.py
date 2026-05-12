@@ -185,6 +185,11 @@ Erstelle ein Ergebnis das die 7 Dimensionen als TENDENZEN im Kontext des Zieljob
 - Bei einem Match-Score von 68% kann NICHT alles "passt_gut" sein! Verteile realistisch.
 - Nutze die Dimension-Scores um den Fit zu begründen. Z.B. hohe Empathie + Skill "Menschen führen" = passt_gut.
 - Die Beschreibung muss EINFACH sein (Berufsschulniveau, Du-Form, 1 Satz).
+- WICHTIG ZUR SPRACHE: Der User HAT den Job noch nicht! Formuliere den fit_grund als POTENZIAL, nicht als Fakt.
+  FALSCH: "Du führst dein Team souverän" (behauptet er kann es schon)
+  RICHTIG: "Deine Mischung aus Empathie und Klarheit ist genau das was hier zählt" (sagt was er mitbringt)
+  FALSCH: "Du bleibst gelassen wenn Schüler stören" (behauptet Verhalten)
+  RICHTIG: "Gelassenheit liegt dir — das hilft hier enorm" (sagt was da ist)
 
 Antworte NUR mit dem JSON-Objekt. Kein Fließtext, keine Erklärung."""
 

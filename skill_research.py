@@ -296,6 +296,11 @@ Der TEST: Würde ein normaler Mensch (kein HR-Manager) sagen "Ja, DAS macht eine
 Weitere Regeln:
 - NUR Skills die mit PERSÖNLICHKEIT zu tun haben (wir testen Persönlichkeit, keine Fachkenntnisse)
 - Pro Skill: 1 Satz Beschreibung in einfacher Sprache (Berufsschulniveau, Du-Form)
+- WICHTIG ZUR SPRACHE: Der User HAT den Job noch nicht! Er will ihn erst. Beschreibe den Skill als ANFORDERUNG, nicht als Zustand.
+  FALSCH: "Du kannst komplexe Inhalte aufbereiten" (klingt als ob er es schon kann)
+  RICHTIG: "Komplexe Dinge so erklären dass sie jeder versteht" (beschreibt was der Job braucht)
+  FALSCH: "Du behältst den Überblick über Unterrichtsinhalte" (behauptet etwas über den User)
+  RICHTIG: "Viele Themen gleichzeitig im Blick behalten" (beschreibt die Anforderung)
 - Sortiere nach Wichtigkeit: Was macht den UNTERSCHIED zwischen gut und schlecht in diesem Job?
 - Gewichtung = Wie wichtig für den Erfolg (0.0-1.0)
 - Varianz = Wie UNTERSCHIEDLICH die Anforderungen sind
@@ -359,6 +364,8 @@ WICHTIG: Übersetze Stellenanzeigen-Sprache in normale Sprache:
 - SONDERN "Menschen führen und motivieren", "Unter Druck Entscheidungen treffen", "Konflikte ansprechen statt aussitzen"
 - NUR Skills die mit PERSÖNLICHKEIT zu tun haben (wir testen Persönlichkeit, keine Fachkenntnisse)
 - Pro Skill: 1 Satz Beschreibung in einfacher Sprache (Du-Form)
+- WICHTIG: Der User HAT den Job noch nicht! Beschreibe Skills als ANFORDERUNG, nicht als Zustand des Users.
+  FALSCH: "Du kannst X" / "Du machst Y" → RICHTIG: "X können" / "Y im Griff haben"
 - Maximal 5-7 Skills. Qualität vor Quantität.
 
 ### 2. Kalibrierungs-Fragen (4-7 Fragen)
