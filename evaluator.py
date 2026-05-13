@@ -196,26 +196,17 @@ Erstelle ein Ergebnis das die 7 Dimensionen als TENDENZEN im Kontext des Zieljob
   Der fit_grund ist kurz, übergeordnet, locker formuliert. Kein pseudo-analytisches Zerlegen von Antworten.
   MAXIMAL 12-15 Wörter pro fit_grund!
   
-  SPRACH-REGEL: Schreibe wie ein kluger Freund der dich kennt. NICHT wie ein Psychologe.
-  VERMEIDE die Dimensions-Namen (NICHT "Empathie", "Durchsetzung", "Stressresistenz", "Extraversion" etc.)
-  Stattdessen NORMALE Worte:
-  - Statt "Empathie ist da" → "Du spürst schnell was andere brauchen"
-  - Statt "hohe Stressresistenz" → "Druck macht dich eher wach als nervös"
-  - Statt "Durchsetzung noch ausbaufähig" → "Könntest öfter sagen was du willst"
-  - Statt "Ist da, aber noch ausbaufähig" → "Grundlage steht, da geht aber noch was"
-  
-  Gute Beispiele:
-    passt_gut: "Das liegt dir — merkt man."
-    passt_gut: "Druck macht dich eher wach als nervös."
-    passt_gut: "Da fühlst du dich wohl, das sieht man."
-    solide_basis: "Grundlage steht — da geht aber noch was."
-    solide_basis: "Kannst du, aber es kostet dich noch Energie."
-    dein_hebel: "Genau hier lohnt es sich reinzulegen."
-    dein_hebel: "Das fällt dir nicht leicht — und genau da liegt der Hebel."
-  
-  NICHT: "Empathie ist da, aber Durchsetzung noch ausbaufähig" (Dimensions-Namen = KI-Sprache)
-  NICHT: "Hohe Stressresistenz bringst du mit" (klingt wie Zeugnis)
-  NICHT: "Deine Mischung aus X und Y" (zu analytisch)
+  SPRACH-REGELN für fit_grund:
+  1. Der Satz muss zum KONKRETEN SKILL passen — nicht generisch wiederverwendbar sein.
+     FALSCH: "Grundlage steht — da geht aber noch was." (könnte unter JEDEM Skill stehen)
+     RICHTIG: "Du bist eher der Typ der zuhört — hier müsste man auch mal auf den Tisch hauen." (passt NUR zu Konflikte/Führung)
+  2. Vermeide Dimensions-Namen (nicht "Empathie", "Durchsetzung", "Stressresistenz").
+     Nutze normale Worte: "spürst was andere brauchen", "sagst klar was du willst", "bleibst ruhig wenns hektisch wird".
+  3. Beziehe dich auf die TENDENZ die du in den Dimension-Scores SIEHST — und verknüpfe sie mit dem Skill.
+     Beispiel: Skill="Konflikte ansprechen", User hat niedrige Durchsetzung → "Du gehst Reibung eher aus dem Weg — hier wäre mehr Direktheit gefragt."
+     Beispiel: Skill="Menschen führen", User hat hohe Empathie + niedrige Durchsetzung → "Du verstehst dein Team gut — trau dich auch mal unbequem zu sein."
+  4. JEDER fit_grund muss EINZIGARTIG sein. Kein Copy-Paste. Jeder Skill bekommt seinen eigenen Satz.
+  5. Max 15 Wörter. Wie ein kluger Freund, nicht wie ein Psychologe.
 
 Antworte NUR mit dem JSON-Objekt. Kein Fließtext, keine Erklärung."""
 
