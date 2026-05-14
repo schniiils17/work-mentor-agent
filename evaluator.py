@@ -125,7 +125,7 @@ Erstelle ein Ergebnis das die 7 Dimensionen als TENDENZEN im Kontext des Zieljob
 
 8. **Bewertungs-Labels:** NUR diese 4: "Sehr stark", "Stark", "Ausgeglichen", "Entwicklungsbedarf".
 
-9. **BIAS-WARNUNG Empathie:** Fast alle User scoren hoch auf Empathie weil die Items sozial erwünscht sind. Empathie als Stärke ist daher KEIN Differenzierungsmerkmal. Nenne Empathie NICHT als Stärke im staerken-Array — wähle stattdessen Dimensionen die wirklich differenzieren (Durchsetzung, Stressresistenz, Autonomie, Offenheit). Empathie darf in skill_fits vorkommen, aber NICHT als herausragende Stärke hervorgehoben werden.
+9. **Stärken/Hebel müssen DIFFERENZIEREN:** Schau dir ALLE Dimension-Scores an. Die Stärke ist die Dimension die am HÖCHSTEN scored. Der Hebel ist die die am NIEDRIGSTEN scored. Nicht pauschal immer Empathie als Stärke nennen nur weil sie hoch ist — wenn ALLE Dimensionen hoch sind, wähle die die für den konkreten Zieljob am meisten Unterschied macht.
 
 10. **Match-Score:** Minimum 60%.
    - 60-69% = Solide Basis
